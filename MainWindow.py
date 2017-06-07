@@ -18,10 +18,11 @@ def chooseFileDialog(param):
     return True
 
 
-def setWindowProperties(self):
+def setWindowProperties(self, cloudTypes):
     """
-    Sets window properties
+    Sets main window properties
     :param self: window, which will be adjusted
+    :param cloudTypes: names of all actively linked modules
     :return: boolean value of success
     """
 
@@ -45,8 +46,7 @@ def setWindowProperties(self):
     labelFromFormat = tk.Label(self, text="Input format:", padx=20)
     labelFromFormat.grid(row=2, column=0, sticky="w")
 
-    comboInputFormat = ttk.Combobox(self, state='readonly')
-    comboInputFormat['values'] = ('A', 'B', 'C')
+    comboInputFormat = ttk.Combobox(self, state='readonly', values=cloudTypes)
     comboInputFormat.grid(row=2, column=1, sticky="w")
     comboInputFormat.current(0)
 
@@ -63,8 +63,7 @@ def setWindowProperties(self):
     labelToFormat = tk.Label(self, text="Output format:", padx=20)
     labelToFormat.grid(row=5, column=0, sticky="w")
 
-    comboOutputFormat = ttk.Combobox(self, state='readonly')
-    comboOutputFormat['values'] = ('D', 'E', 'F')
+    comboOutputFormat = ttk.Combobox(self, state='readonly', values=cloudTypes)
     comboOutputFormat.grid(row=5, column=1, sticky="w")
     comboOutputFormat.current(0)
 
@@ -74,20 +73,29 @@ def setWindowProperties(self):
                                                                   entryTo.get(), comboOutputFormat.get()))
     buttonSubmit.grid(row=6, column=2)
 
-    return False
+    return True
 
 
-def infoWindow(messageType, title, message):
+def infoWindow(messageType, message, *args):
     """
     Function, that shows message window with a custom message
     :param messageType: Type of message (error, warning, info)
-    :param title: Title of window
     :param message: Body of message
+    :param args: first optional argument is window title
     :return: 
     """
     if messageType == "error":
-        messagebox.showerror(title, message)
+        if not args:
+            messagebox.showerror("Error", message)
+        else:
+            messagebox.showerror(args[0], message)
     elif messageType == "warning":
-        messagebox.showwarning(title, message)
+        if not args:
+            messagebox.showwarning("Warning", message)
+        else:
+            messagebox.showwarning(args[0], message)
     else:
-        messagebox.showinfo(title, message)
+        if not args:
+            messagebox.showinfo("Information", message)
+        else:
+            messagebox.showinfo(args[0], message)
