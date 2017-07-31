@@ -3,13 +3,30 @@ from tkinter import ttk, filedialog, messagebox
 import CloudMigration as CloudMigration
 
 
-def chooseFileDialog(param):
+def openFileDialog(param):
     """
     Sets file name into parameter
     :param param: object, to which is file name inserted
     :return: boolean value of success
     """
-    file = filedialog.askopenfilename()
+    file = filedialog.askopenfilename(filetypes=[('JSON', ('*.json', '*.template'),), ('YAML', ('*.yaml', '*.yml'),),
+                                                 ('Text', '*.txt',), ('Generic', '*.generic',), ('All Files', '.*')])
+    # delete entry
+    param.delete(0, 'end')
+    # insert file name into entry
+    param.insert(0, file)
+
+    return True
+
+
+def saveFileDialog(param):
+    """
+    Sets file name into parameter
+    :param param: object, to which is file name inserted
+    :return: boolean value of success
+    """
+    file = filedialog.asksaveasfilename(filetypes=[('JSON', ('*.json', '*.template'),), ('YAML', ('*.yaml', '*.yml'),),
+                                                   ('Generic', '*.generic',)])
     # delete entry
     param.delete(0, 'end')
     # insert file name into entry
@@ -40,7 +57,7 @@ def setWindowProperties(self, cloudTypes):
     entryFrom = tk.Entry(self)
     entryFrom.grid(row=1, column=0, columnspan=2, padx=20, ipadx=70, sticky="w")
 
-    buttonFileFrom = tk.Button(self, text="Choose file", command=lambda: chooseFileDialog(entryFrom))
+    buttonFileFrom = tk.Button(self, text="Choose file", command=lambda: openFileDialog(entryFrom))
     buttonFileFrom.grid(row=1, column=2, sticky="w")
 
     labelFromFormat = tk.Label(self, text="Input format:", padx=20)
@@ -57,7 +74,7 @@ def setWindowProperties(self, cloudTypes):
     entryTo = tk.Entry(self)
     entryTo.grid(row=4, column=0, columnspan=2, padx=20, ipadx=70, sticky="w")
 
-    buttonFileTo = tk.Button(self, text="Choose file", command=lambda: chooseFileDialog(entryTo))
+    buttonFileTo = tk.Button(self, text="Choose file", command=lambda: saveFileDialog(entryTo))
     buttonFileTo.grid(row=4, column=2, sticky="w")
 
     labelToFormat = tk.Label(self, text="Output format:", padx=20)
@@ -67,11 +84,22 @@ def setWindowProperties(self, cloudTypes):
     comboOutputFormat.grid(row=5, column=1, sticky="w")
     comboOutputFormat.current(0)
 
+    ##### test purposes
+    entryFrom.insert(0, "C:/Users/marek/Documents/cloud/puppetmaster.template")
+    entryTo.insert(0, 'C:/Users/marek/Documents/cloud/test1.generic')
+    comboInputFormat.current(1)
+    ######
+
     # last part, execute button
     buttonSubmit = tk.Button(self, text="Make!",
-                             command=lambda: CloudMigration.wheel(entryFrom.get(), comboInputFormat.get(),
-                                                                  entryTo.get(), comboOutputFormat.get()))
+                             command=lambda: CloudMigration.doTransformation(entryFrom.get(), comboInputFormat.get(),
+                                                                             entryTo.get(), comboOutputFormat.get()))
     buttonSubmit.grid(row=6, column=2)
+
+    # Binding "Enter" key to submit button and getting focus to the button
+    buttonSubmit.bind('<Return>', lambda event: CloudMigration.doTransformation(entryFrom.get(), comboInputFormat.get(),
+                                                                                entryTo.get(), comboOutputFormat.get()))
+    self.bind('<Return>', buttonSubmit.focus_set())
 
     return True
 
