@@ -1,5 +1,10 @@
 from abc import ABC, abstractmethod
-import MainWindow as MainWindow
+
+
+def pprint(*args, **kwargs):
+    printToConsole = 0
+    if printToConsole:
+        print(*args, **kwargs)
 
 
 class GlobalMethods(ABC):
@@ -8,16 +13,9 @@ class GlobalMethods(ABC):
     def readFromFile(self, paFile):
         raise NotImplemented
 
-    @staticmethod
-    def saveToFile(paFile, paString):
-        try:
-            file = open(paFile, 'w')
-            file.write(paString)
-        except IOError:
-            MainWindow.infoWindow("error", "Error in saving file " + paFile)
-            return False
-
-        return True
+    @abstractmethod
+    def saveToFile(self, paFile, paString):
+        raise NotImplemented
 
     @abstractmethod
     def printName(self):

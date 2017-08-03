@@ -4,58 +4,37 @@ import glob
 import gc
 
 
-def doTransformation(param1, param2, param3, param4):
+def doTransformation(fromFile, fromModule, toFile, toModule):
     # Checks
-    if param2 == param4:
+    if fromModule == toModule:
         MainWindow.infoWindow("error", "Unable to convert into same template.", "Error in types")
         return 1
 
-    if param2 != 'Generic' and param4 != 'Generic':
-        MainWindow.infoWindow("error", "One template format has to be \"Generic\"")
-        return 1
-
-    # pom1 = __import__(param2)
-    # pom1.tests()
-
     # From module
-    if param2 == "AWS_JSON":
-        from mod_AWS_JSON import AWS_JSON as module1
-    elif param2 == "AWS_YAML":
-        from mod_AWS_YAML import AWS_YAML as module1
-    elif param2 == "OpenStack":
+    if fromModule == "AWS":
+        from mod_AWS import AWS as module1
+    elif fromModule == "OpenStack":
         from mod_OpenStack import OpenStack as module1
     else:
         from Generic import Generic as module1
 
     # To module
-    if param4 == "AWS_JSON":
-        from mod_AWS_JSON import AWS_JSON as module2
-    elif param4 == "AWS_YAML":
-        from mod_AWS_YAML import AWS_YAML as module2
-    elif param4 == "OpenStack":
+    if toModule == "AWS":
+        from mod_AWS import AWS as module2
+    elif toModule == "OpenStack":
         from mod_OpenStack import OpenStack as module2
     else:
         from Generic import Generic as module2
 
+    # make instances from modules
     mod1 = module1()
     mod2 = module2()
 
+    # Creating generic JSON from original file
+    genericString = mod1.readFromFile(fromFile)
 
-    # string = mod1.readFromFile(param1)
-    # if not string:
-    #     return 1
-
-    mod1.saveToFile(param3, mod1.readFromFile(param1))
-
-    # print(string)
-
-    # mod2.printName()
-
-
-
-
-    # saves string to file
-    # mod2.saveToFile(param3, string)
+    # Saving into platform specific file
+    mod2.saveToFile(toFile, genericString)
 
     MainWindow.infoWindow("info", "Successfully done!")
 
@@ -64,24 +43,26 @@ def doTransformation(param1, param2, param3, param4):
     return 0
 
 
-def showLoadableModules(paramModules):
+def showLoadableModules(paModules):
     """
-
-    :param paramModules:
-    :return:
+    Search for all modules. If the name of directory starts with "mod_", it is treated as a python module and the name
+    is appended to the array get by the parameter.
+    :param paModules: array, to which are names of modules appended
+    :return: array given by parameter with module names added
     """
 
     # Find everything, what starts with "mod_"
     for moduleName in glob.glob("mod_*"):
-        moduleName = moduleName.partition("_")[2]
-        paramModules.append(moduleName)
+        # append substring started with fourth letter (cut the "mod_" part)
+        paModules.append(moduleName[4:])
 
-    return modules
+    return paModules
 
 
 # Main method
 if __name__ == "__main__":
 
+    # If set to 1, everything is printed to console
     gc.set_debug(0)
 
     # Create main window

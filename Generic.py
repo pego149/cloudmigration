@@ -18,3 +18,13 @@ class Generic(GlobalMethods):
             return False
 
         return file.read()
+
+    def saveToFile(self, paFile, paString):
+        try:
+            file = open(paFile, 'w')
+            file.write(paString)
+        except IOError:
+            MainWindow.infoWindow("error", "Error in saving file " + paFile)
+            return False
+
+        return True

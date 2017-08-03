@@ -86,8 +86,9 @@ def setWindowProperties(self, cloudTypes):
 
     ##### test purposes
     entryFrom.insert(0, "C:/Users/marek/Documents/cloud/puppetmaster.template")
-    entryTo.insert(0, 'C:/Users/marek/Documents/cloud/test1.generic')
+    entryTo.insert(0, 'C:/Users/marek/Documents/cloud/test-openstack.yaml')
     comboInputFormat.current(1)
+    comboOutputFormat.current(2)
     ######
 
     # last part, execute button

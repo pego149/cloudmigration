@@ -1,11 +1,10 @@
-from globalMethods import GlobalMethods
+from globalMethods import GlobalMethods, pprint
 import MainWindow as MainWindow
 import json
 import yaml
-import gc
 
 
-class AWS_JSON(GlobalMethods):
+class AWS(GlobalMethods):
     def __init__(self):
         self.name = "AWS JSON class"
 
@@ -17,7 +16,7 @@ class AWS_JSON(GlobalMethods):
     ##########################################
 
     @staticmethod
-    def instance(paAttribute):
+    def instanceToGeneric(paAttribute):
         """
         Method that transforms AWS JSON instance into Generic format in YAML.
         :param paAttribute: properties of AWS instance (AWS::EC2::Instance) in JSON format
@@ -29,23 +28,42 @@ class AWS_JSON(GlobalMethods):
         for i in paAttribute:
             # Image property (in AWS called AMI).
             if i == "ImageId":
-                print(" " * 6 + "image: " + str(paAttribute[i]).replace("'", ""))
-                string += " " * 6 + "image: " + str(paAttribute[i]).replace("'", "") + "\n"
+                # Checks, if it is reference
+                if isinstance(paAttribute[i], dict):
+                    pprint(" " * 6 + "image: { ref: " + paAttribute[i]["Ref"] + " }")
+                    string += " " * 6 + "image: { ref: " + paAttribute[i]["Ref"] + " }\n"
+                else:
+                    pprint(" " * 6 + "image: " + paAttribute[i])
+                    string += " " * 6 + "image: " + paAttribute[i] + "\n"
 
             # SSH key property.
             elif i == "KeyName":
-                print(" " * 6 + "key: " + str(paAttribute[i]).replace("'", ""))
-                string += " " * 6 + "key: " + str(paAttribute[i]).replace("'", "") + "\n"
+                # Checks, if it is reference
+                if isinstance(paAttribute[i], dict):
+                    pprint(" " * 6 + "key: { ref: " + paAttribute[i]["Ref"] + " }")
+                    string += " " * 6 + "key: { ref: " + paAttribute[i]["Ref"] + " }\n"
+                else:
+                    pprint(" " * 6 + "key: " + paAttribute[i])
+                    string += " " * 6 + "key: " + paAttribute[i] + "\n"
 
             # Instance type property. Defines CPU, RAM, HDD, ...
             elif i == "InstanceType":
-                print(" " * 6 + "instance_type: " + str(paAttribute[i]).replace("'", ""))
-                string += " " * 6 + "instance_type: " + str(paAttribute[i]).replace("'", "") + "\n"
+                # Checks, if it is reference
+                if isinstance(paAttribute[i], dict):
+                    pprint(" " * 6 + "instance_type: { ref: " + paAttribute[i]["Ref"] + " }")
+                    string += " " * 6 + "instance_type: { ref: " + paAttribute[i]["Ref"] + " }\n"
+                else:
+                    pprint(" " * 6 + "instance_type: " + paAttribute[i])
+                    string += " " * 6 + "instance_type: " + paAttribute[i] + "\n"
 
             # Availability zone property.
             elif i == "AvailabilityZone":
-                print(" " * 6 + "availability_zone: " + str(paAttribute[i]).replace("'", ""))
-                string += " " * 6 + "availability_zone: " + str(paAttribute[i]).replace("'", "") + "\n"
+                if isinstance(paAttribute[i], dict):
+                    pprint(" " * 6 + "availability_zone: { ref: " + paAttribute[i]["Ref"] + " }")
+                    string += " " * 6 + "availability_zone: { ref: " + paAttribute[i]["Ref"] + " }\n"
+                else:
+                    pprint(" " * 6 + "availability_zone: " + paAttribute[i])
+                    string += " " * 6 + "availability_zone: " + paAttribute[i] + "\n"
 
             # User data. It gets and parses user data. Data itself are in "bare_data". If there are any
             # parameters/references, they are changed for key word  "parameter#", where # is subtracted for
@@ -54,8 +72,8 @@ class AWS_JSON(GlobalMethods):
                 array = []
                 paramCount = 0
 
-                print(" " * 6 + "user_data:")
-                print(" " * 8 + "bare_data:")
+                pprint(" " * 6 + "user_data:")
+                pprint(" " * 8 + "bare_data:")
                 string += " " * 6 + "user_data:\n"
                 string += " " * 8 + "bare_data:\n"
 
@@ -63,40 +81,40 @@ class AWS_JSON(GlobalMethods):
                 for j in paAttribute[i]["Fn::Base64"]["Fn::Join"][1]:
                     try:
                         string += " " * 10 + j
-                        print(j, end='')
+                        pprint(" " * 10 + j, end='')
 
                     # If there is any reference, increment parameters count and add reference to array.
                     except TypeError:
                         array.append(j["Ref"])
                         paramCount += 1
-                        string += " " * 10 + "$parameter" + str(paramCount) + " "
-                        print(" " * 10 + "$parameter" + str(paramCount) + " ")
+                        string += "$parameter" + str(paramCount) + " "
+                        pprint("$parameter" + str(paramCount) + " ", end='')
 
-                # If are there any parameters, print a section with them.
+                # If are there any parameters, pprint a section with them.
                 if paramCount > 0:
                     string += " " * 8 + "parameters:\n"
-                    print(" " * 8 + "parameters:")
+                    pprint(" " * 8 + "parameters:")
                     for j in range(1, paramCount + 1):
                         string += " " * 10 + "$parameter" + str(j) + ": " + array[j - 1] + "\n"
-                        print(" " * 10 + "$parameter" + str(j) + ": " + array[j - 1])
+                        pprint(" " * 10 + "$parameter" + str(j) + ": " + array[j - 1])
 
             # Tags properties. They are written in form Key: Value.
             elif i == "Tags":
-                print(" " * 6 + "tags:")
+                pprint(" " * 6 + "tags:")
                 string += " " * 6 + "tags: " + "\n"
                 for j in paAttribute["Tags"]:
-                    print(" " * 8 + "" + j["Key"] + ": " + j["Value"])
+                    pprint(" " * 8 + "" + j["Key"] + ": " + j["Value"])
                     string += " " * 8 + j["Key"] + ": " + j["Value"] + "\n"
 
             # Else write, that this property is not implemented yet.
             else:
-                print(" " * 6 + i + ": Not implemented")
+                pprint(" " * 6 + i + ": Not implemented")
                 string += " " * 6 + i + ": Not implemented" + "\n"
 
         return string
 
     @staticmethod
-    def subnet(paAttribute):
+    def subnetToGeneric(paAttribute):
         """
         Method that transforms AWS JSON subnet into Generic format in YAML.
         :param paAttribute: properties of AWS subnet (AWS::EC2::Subnet) in JSON format
@@ -108,36 +126,52 @@ class AWS_JSON(GlobalMethods):
         for i in paAttribute:
             # Network, that Subnet is par of.
             if i == "VpcId":
-                print(" " * 6 + "network: " + str(paAttribute[i]).replace("'", ""))
-                string += " " * 6 + "network: " + str(paAttribute[i]).replace("'", "") + "\n"
+                # Checks, if it is reference
+                if isinstance(paAttribute[i], dict):
+                    pprint(" " * 6 + "network: { ref: " + paAttribute[i]["Ref"] + " }")
+                    string += " " * 6 + "network: { ref: " + paAttribute[i]["Ref"] + " }\n"
+                else:
+                    pprint(" " * 6 + "network: " + paAttribute[i])
+                    string += " " * 6 + "network: " + paAttribute[i] + "\n"
+
 
             # IP subnet in CIDR format (192.168.1.0/24).
             elif i == "CidrBlock":
-                print(" " * 6 + "cidr: " + str(paAttribute[i]).replace("'", ""))
-                string += " " * 6 + "cidr: " + str(paAttribute[i]).replace("'", "") + "\n"
+                # Checks, if it is reference
+                if isinstance(paAttribute[i], dict):
+                    pprint(" " * 6 + "cidr: { ref: " + paAttribute[i]["Ref"] + " }")
+                    string += " " * 6 + "cidr: { ref: " + paAttribute[i]["Ref"] + " }\n"
+                else:
+                    pprint(" " * 6 + "cidr: " + paAttribute[i])
+                    string += " " * 6 + "cidr: " + paAttribute[i] + "\n"
 
             # Availability zone property.
             elif i == "AvailabilityZone":
-                print(" " * 6 + "availability_zone: " + str(paAttribute[i]).replace("'", ""))
-                string += " " * 6 + "availability_zone: " + str(paAttribute[i]).replace("'", "") + "\n"
+                # Checks, if it is reference
+                if isinstance(paAttribute[i], dict):
+                    pprint(" " * 6 + "availability_zone: { ref: " + paAttribute[i]["Ref"] + " }")
+                    string += " " * 6 + "availability_zone: { ref: " + paAttribute[i]["Ref"] + " }\n"
+                else:
+                    pprint(" " * 6 + "availability_zone: " + paAttribute[i])
+                    string += " " * 6 + "availability_zone: " + paAttribute[i] + "\n"
 
             # Tags properties. They are written in form Key: Value.
             elif i == "Tags":
-                print(" " * 6 + "tags:")
+                pprint(" " * 6 + "tags:")
                 string += " " * 6 + "tags: " + "\n"
                 for j in paAttribute["Tags"]:
-                    print(" " * 8 + "" + j["Key"] + ": " + j["Value"])
+                    pprint(" " * 8 + "" + j["Key"] + ": " + j["Value"])
                     string += " " * 8 + j["Key"] + ": " + j["Value"] + "\n"
 
             # Else write, that this property is not implemented yet.
             else:
-                print(" " * 6 + i + ": Not implemented")
+                pprint(" " * 6 + i + ": Not implemented")
                 string += " " * 6 + i + ": Not implemented" + "\n"
 
         return string
 
     @staticmethod
-    def network(paAttribute):
+    def networkToGeneric(paAttribute):
         """
         Method that transforms AWS JSON network into Generic format in YAML.
         :param paAttribute: properties of AWS network (AWS::EC2::VPC) in JSON format
@@ -149,26 +183,31 @@ class AWS_JSON(GlobalMethods):
         for i in paAttribute:
             # IP subnet in CIDR format (192.168.1.0/24).
             if i == "CidrBlock":
-                print(" " * 6 + "cidr: " + str(paAttribute[i]).replace("'", ""))
-                string += " " * 6 + "cidr: " + str(paAttribute[i]).replace("'", "") + "\n"
+                # Checks, if it is reference
+                if isinstance(paAttribute[i], dict):
+                    pprint(" " * 6 + "cidr: { ref: " + paAttribute[i]["Ref"] + " }")
+                    string += " " * 6 + "cidr: { ref: " + paAttribute[i]["Ref"] + " }\n"
+                else:
+                    pprint(" " * 6 + "cidr: " + paAttribute[i])
+                    string += " " * 6 + "cidr: " + paAttribute[i] + "\n"
 
             # Tags properties. They are written in form Key: Value.
             elif i == "Tags":
-                print(" " * 6 + "tags:")
+                pprint(" " * 6 + "tags:")
                 string += " " * 6 + "tags: " + "\n"
                 for j in paAttribute["Tags"]:
-                    print(" " * 8 + "" + j["Key"] + ": " + j["Value"])
+                    pprint(" " * 8 + "" + j["Key"] + ": " + j["Value"])
                     string += " " * 8 + j["Key"] + ": " + j["Value"] + "\n"
 
             # Else write, that this property is not implemented yet.
             else:
-                print(" " * 6 + i + ": Not implemented")
+                pprint(" " * 6 + i + ": Not implemented")
                 string += " " * 6 + i + ": Not implemented" + "\n"
 
         return string
 
     @staticmethod
-    def securityGroup(paAttribute):
+    def securityGroupToGeneric(paAttribute):
         """
         Method that transforms AWS JSON security groups into Generic format in YAML.
         :param paAttribute: properties of AWS network (AWS::EC2::SecurityGroup) in JSON format
@@ -180,16 +219,16 @@ class AWS_JSON(GlobalMethods):
         for i in paAttribute:
             # Writes description of Security group.
             if i == "GroupDescription":
-                print(" "*6 + "description: " + paAttribute[i])
+                pprint(" "*6 + "description: " + paAttribute[i])
                 string += " "*6 + "description: " + paAttribute[i] + "\n"
 
             # Security group rules in both: inbound and outbound directions.
             elif i == "SecurityGroupIngress" or i == "SecurityGroupEgress":
                 if i == "SecurityGroupIngress":
-                    print(" " * 6 + "ingres_rules:")
+                    pprint(" " * 6 + "ingres_rules:")
                     string += " " * 6 + "ingres_rules:\n"
                 else:
-                    print(" " * 6 + "egress_rules:")
+                    pprint(" " * 6 + "egress_rules:")
                     string += " " * 6 + "egress_rules:\n"
 
                 for j in paAttribute[i]:
@@ -197,285 +236,307 @@ class AWS_JSON(GlobalMethods):
                     for k in j:
                         # Transport protocol carried in IP packet.
                         if k == "IpProtocol":
-                            # If it is not first in list, just print it.
+                            # If it is not first in list, just pprint it.
                             if not first:
-                                print(" " * 10 + "protocol: " + j["IpProtocol"])
+                                pprint(" " * 10 + "protocol: " + j["IpProtocol"])
                                 string += " " * 10 + "protocol: " + j["IpProtocol"] + "\n"
 
                             # If it is first in the list, write dash before it.
                             else:
                                 first = 0
-                                print(" " * 8 + "- protocol: " + j["IpProtocol"])
+                                pprint(" " * 8 + "- protocol: " + j["IpProtocol"])
                                 string += " " * 8 + "- protocol: " + j["IpProtocol"] + "\n"
 
                         # First port to start list with.
                         elif k == "FromPort":
-                            # If it is not first in list, just print it.
+                            # If it is not first in list, just pprint it.
                             if not first:
-                                print(" " * 10 + "from_port: " + j["FromPort"])
+                                pprint(" " * 10 + "from_port: " + j["FromPort"])
                                 string += " " * 10 + "from_port: " + j["FromPort"] + "\n"
 
                             # If it is first in the list, write dash before it.
                             else:
                                 first = 0
-                                print(" " * 8 + "- from_port: " + j["FromPort"])
+                                pprint(" " * 8 + "- from_port: " + j["FromPort"])
                                 string += " " * 8 + "- from_port: " + j["FromPort"] + "\n"
 
                         # Last port in the list.
                         elif k == "ToPort":
-                            # If it is not first in list, just print it.
+                            # If it is not first in list, just pprint it.
                             if not first:
-                                print(" " * 10 + "to_port: " + j["ToPort"])
+                                pprint(" " * 10 + "to_port: " + j["ToPort"])
                                 string += " " * 10 + "to_port: " + j["ToPort"] + "\n"
 
                             # If it is first in the list, write dash before it.
                             else:
                                 first = 0
-                                print(" " * 8 + "- to_port: " + j["ToPort"])
+                                pprint(" " * 8 + "- to_port: " + j["ToPort"])
                                 string += " " * 8 + "- to_port: " + j["ToPort"] + "\n"
 
                         # Network addres to bind rule to. In CIDR format (192.168.10.0/24).
                         elif k == "CidrIp":
-                            # If it is not first in list, just print it.
+                            # If it is not first in list, just pprint it.
                             if not first:
-                                print(" " * 10 + "cidr: " + str(j[k]).replace("'", ""))
-                                string += " " * 10 + "cidr: " + str(j[k]).replace("'", "") + "\n"
+                                # Checks, if it is reference
+                                if isinstance(j[k], dict):
+                                    pprint(" " * 10 + "cidr: { ref: " + j[k]["Ref"] + " }")
+                                    string += " " * 10 + "cidr: { ref: " + j[k]["Ref"] + " }\n"
+                                else:
+                                    pprint(" " * 10 + "cidr: " + j[k])
+                                    string += " " * 10 + "cidr: " + j[k] + "\n"
 
                             # If it is first in the list, write dash before it.
                             else:
                                 first = 0
-                                print(" " * 8 + "- cidr: " + str(j[k]).replace("'", ""))
-                                string += " " * 8 + "- cidr: " + str(j[k]).replace("'", "") + "\n"
+                                # Checks, if it is reference
+                                if isinstance(j[k], dict):
+                                    pprint(" " * 8 + "- cidr: { ref: " + j[k] + " }")
+                                    string += " " * 8 + "- cidr: { ref: " + j[k] + " }\n"
+                                else:
+                                    pprint(" " * 8 + "- cidr: " + j[k])
+                                    string += " " * 8 + "- cidr: " + j[k] + "\n"
 
                         # Otherwise write, that it is not implemented yet.
                         else:
-                            # If it is not first in list, just print it.
+                            # If it is not first in list, just pprint it.
                             if not first:
-                                print(" " * 10 + k + ": Not Implemented")
+                                pprint(" " * 10 + k + ": Not Implemented")
                                 string += " " * 10 + k + ": Not Implemented\n"
 
                             # If it is first in the list, write dash before it.
                             else:
                                 first = 0
-                                print(" " * 8 + "- " + k + ": Not Implemented")
+                                pprint(" " * 8 + "- " + k + ": Not Implemented")
                                 string += " " * 8 + "- " + k + ": Not Implemented\n"
 
             # Tags properties. They are written in form Key: Value.
             elif i == "Tags":
-                print(" " * 6 + "tags:")
+                pprint(" " * 6 + "tags:")
                 string += " " * 6 + "tags: " + "\n"
                 for j in paAttribute["Tags"]:
-                    print(" " * 8 + "" + j["Key"] + ": " + j["Value"])
+                    pprint(" " * 8 + "" + j["Key"] + ": " + j["Value"])
                     string += " " * 8 + j["Key"] + ": " + j["Value"] + "\n"
 
             # Else write, that this property is not implemented yet.
             else:
-                print(" " * 6 + i + ": Not implemented")
+                pprint(" " * 6 + i + ": Not implemented")
                 string += " " * 6 + i + ": Not implemented" + "\n"
 
         return string
 
     @staticmethod
-    def dnsRecord(paAttribute):
+    def dnsRecordToGeneric(paAttribute):
+        """
+        Method that transforms AWS JSON DNS resource record into Generic format in YAML.
+        :param paAttribute: properties of AWS DNS RR (AWS::Route53::RecordSet) in JSON format
+        :return: string in YAML format
+        """
+
         string = ""
 
         for i in paAttribute:
             # Name of the RR
             if i == "Name":
-                print(" " * 6 + "name: " + paAttribute[i])
+                pprint(" " * 6 + "name: " + paAttribute[i])
                 string += " " * 6 + "name: " + paAttribute[i] + "\n"
 
             # Type of the RR
             elif i == "Type":
-                print(" " * 6 + "type: " + paAttribute[i])
+                pprint(" " * 6 + "type: " + paAttribute[i])
                 string += " " * 6 + "type: " + paAttribute[i] + "\n"
 
             # Value of the RR
             elif i == "ResourceRecords":
-                print(" " * 6 + "record: " + str(paAttribute[i]).replace("'", ""))
-                string += " " * 6 + "record: " + str(paAttribute[i]).replace("'", "") + "\n"
+                #pprint(" " * 6 + "record: " + str(paAttribute[i]).replace("'", ""))
+                #string += " " * 6 + "record: " + str(paAttribute[i]).replace("'", "") + "\n"
+
+                pprint(" " * 6 + "records:")
+                string += " " * 6 + "records:\n"
+
+                for j in paAttribute[i]:
+                    pprint(" " * 8 + "- attribute")
+                    string += " " * 8 + "- attribute\n"
+
+                    pprint(" " * 10 + "- " + j["Fn::GetAtt"][0])
+                    string += " " * 10 + "- " + j["Fn::GetAtt"][0] + "\n"
+                    pprint(" " * 12 + j["Fn::GetAtt"][1])
+                    string += " " * 12 + j["Fn::GetAtt"][1] + "\n"
 
             # TTL of the RR
             elif i == "TTL":
-                print(" " * 6 + "ttl: " + paAttribute[i])
+                pprint(" " * 6 + "ttl: " + paAttribute[i])
                 string += " " * 6 + "ttl: " + paAttribute[i] + "\n"
 
             # Comment
             elif i == "Comment":
-                print(" " * 6 + "comment: " + paAttribute[i])
+                pprint(" " * 6 + "comment: " + paAttribute[i])
                 string += " " * 6 + "comment: " + paAttribute[i] + "\n"
 
             # Zone in which is RR
             elif i == "HostedZoneId":
-                print(" " * 6 + "zone: " + str(paAttribute[i]).replace("'", ""))
-                string += " " * 6 + "zone: " + str(paAttribute[i]).replace("'", "") + "\n"
+                # Checks, if it is reference
+                if isinstance(paAttribute[i], dict):
+                    pprint(" " * 6 + "zone: { ref: " + paAttribute[i]["Ref"] + " }")
+                    string += " " * 6 + "zone: { ref: " + paAttribute[i]["Ref"] + " }\n"
+                else:
+                    pprint(" " * 6 + "zone: " + paAttribute[i])
+                    string += " " * 6 + "zone: " + paAttribute[i] + "\n"
 
             # Tags properties. They are written in form Key: Value.
             elif i == "Tags":
-                print(" " * 6 + "tags:")
+                pprint(" " * 6 + "tags:")
                 string += " " * 6 + "tags: " + "\n"
                 for j in paAttribute["Tags"]:
-                    print(" " * 8 + "" + j["Key"] + ": " + j["Value"])
+                    pprint(" " * 8 + "" + j["Key"] + ": " + j["Value"])
                     string += " " * 8 + j["Key"] + ": " + j["Value"] + "\n"
 
             # Else write, that this property is not implemented yet.
             else:
-                print(" " * 6 + i + ": Not implemented")
+                pprint(" " * 6 + i + ": Not implemented")
                 string += " " * 6 + i + ": Not implemented" + "\n"
 
         return string
 
     @staticmethod
-    def autocsaling(paAttribute):
+    def autocsalingGroupToGeneric(paAttribute):
         # TODO dorobit
         pass
 
     @staticmethod
-    def loadBallancer(paAttribute):
+    def autocsalingPolicyToGeneric(paAttribute):
         # TODO dorobit
         pass
 
-    # @staticmethod
-    # def instance(paAttribute):
-    #     string = ""
-    #
-    #     for i in paAttribute:
-    #         if i == " ":
-    #             print()
-    #         elif i == "":
-    #             print()
-    #
-    #         # Tags properties. They are written in form Key: Value.
-    #         elif i == "Tags":
-    #             print(" " * 6 + "tags:")
-    #             string += " " * 6 + "tags: " + "\n"
-    #             for j in paAttribute["Tags"]:
-    #                 print(" " * 8 + "" + j["Key"] + ": " + j["Value"])
-    #                 string += " " * 8 + j["Key"] + ": " + j["Value"] + "\n"
-    #
-    #         # Else write, that this property is not implemented yet.
-    #         else:
-    #             print(" " * 6 + i + ": Not implemented")
-    #             string += " " * 6 + i + ": Not implemented" + "\n"
-    #
-    #     return string
+    @staticmethod
+    def loadBalancerToGeneric(paAttribute):
+        # TODO dorobit
+        pass
 
     ##########################################
-    # Main function
+    # Main functions
     ##########################################
-
 
     def readFromFile(self, paFile):
+        """
+        Method reads data from file passes as parameter. Data can be in two formats, JSON and YAML. It parses it, and
+        calls other methods, which parses smaller parts of given data. Finallz, it returns string in generic format.
+        The string is formatted in JSON format.
+        :param paFile: file to read data from
+        :return: converted string in generic format, written in JSON
+        """
 
+        # This string is being filled with data and finally is returned from this function.
         finalString = ""
 
-        # Reads JSON from file
+        # Reads data from file. It is smart, will read both: YAML and JSON.
         with open(paFile) as data_file:
             string = json.load(data_file)
+            #string = json.dumps(yaml.load(data_file), sort_keys=False, indent=2)
 
         # Prints format of this template.
-        print("AWS Template Format: " + string["AWSTemplateFormatVersion"])
+        pprint("AWS Template Format: " + string["AWSTemplateFormatVersion"])
 
-        # Because of issues of date in JSON, it is printed with dots. Therefore it is recommended to check ity manually.
+        # Because of issues of date in JSON, it is pprinted with dots. Therefore it is recommended to check ity manually.
         finalString += "Template_version: " + string["AWSTemplateFormatVersion"].replace("-", ".") + \
                        " - Please check and update manually\n"
 
         # Prints description of whole template.
-        print("Description: " + string["Description"] + "\n")
+        pprint("Description: " + string["Description"] + "\n")
         finalString += "Description: " + string["Description"] + "\n"
 
         ###########################################################################################
         # PARAMETERS
         ###########################################################################################
 
-        print("Parameters:\n")
+        pprint("Parameters:\n")
         parameter = string["Parameters"]
         finalString += "Parameters:\n"
 
-        # Iterates all parameters and prints them
+        # Iterates all parameters and pprints them
         for i in parameter:
             # Prints name of parameter.
-            print(i + ":")
+            pprint(i + ":")
             finalString += "  " + i + ":\n"
 
             for attribute in parameter[i]:
-                # prints name of attribute
-                print("  " + attribute + ": ", end='')
+                # pprints name of attribute
+                pprint("  " + attribute + ": ", end='')
                 finalString += "    " + attribute + ": "
 
-                # In these types of attributes, there is just simple print of original value.
+                # In these types of attributes, there is just simple pprint of original value.
                 if attribute == "Type" or attribute == "Description" or attribute == "Default" or \
                                 attribute == "MinLength" or attribute == "MaxLength" or \
                                 attribute == "ConstraintDescription":
-                    print(parameter[i][attribute])
+                    pprint(parameter[i][attribute])
                     finalString += parameter[i][attribute] + "\n"
 
-                # In Allowed pattern, there is Regex, which is printed with warning, that it should be checked manually.
+                # In Allowed pattern, there is Regex, which is pprinted with warning, that it should be checked manually.
                 elif attribute == "AllowedPattern":
-                    print(str(parameter[i][attribute]))
+                    pprint(str(parameter[i][attribute]))
                     finalString += "Check manually " + parameter[i][attribute] + "\n"
 
-                # Allowed values are printed as a list.
+                # Allowed values are pprinted as a list.
                 elif attribute == "AllowedValues":
-                    print()
+                    pprint()
                     for k in parameter[i][attribute]:
-                        print(" " * 4 + "- " + k)
+                        pprint(" " * 4 + "- " + k)
                         finalString += "\n" + " " * 4 + "- " + k + "\n"
 
                 # Else write, that it is not implemented yet.
                 else:
-                    print("Not implemented")
+                    pprint("Not implemented")
                     finalString += "Not Implemented\n"
 
         ###########################################################################################
         # RESOURCES
         ###########################################################################################
 
-        print("\nResources:\n")
+        pprint("\nResources:\n")
         resource = string["Resources"]
         finalString += "Resources:\n"
 
         for i in resource:
-            # prints name of resource
-            print("  " + i + ": ")
+            # pprints name of resource
+            pprint("  " + i + ": ")
             finalString += "  " + i + ":\n"
 
             # Based on resource name, calls method which will transform property data.
             if resource[i]["Type"] == "AWS::EC2::Instance":
-                print(" " * 4 + "Type: Generic::VirtualMachine")
+                pprint(" " * 4 + "Type: Generic::VirtualMachine")
                 finalString += " " * 4 + "Type: Generic::VirtualMachine\n"
-                print(" " * 4 + "Properties:")
-                finalString += " " * 4 + "Properties:\n" + self.instance(resource[i]["Properties"])
+                pprint(" " * 4 + "Properties:")
+                finalString += " " * 4 + "Properties:\n" + self.instanceToGeneric(resource[i]["Properties"])
             elif resource[i]["Type"] == "AWS::EC2::VPC":
-                print(" " * 4 + "Type: Generic::Network")
+                pprint(" " * 4 + "Type: Generic::Network")
                 finalString += " " * 4 + "Type: Generic::Network\n"
-                print(" " * 4 + "Properties:")
-                finalString += " " * 4 + "Properties:\n" + self.network(resource[i]["Properties"])
+                pprint(" " * 4 + "Properties:")
+                finalString += " " * 4 + "Properties:\n" + self.networkToGeneric(resource[i]["Properties"])
             elif resource[i]["Type"] == "AWS::EC2::Subnet":
-                print(" " * 4 + "Type: Generic::Subnet")
+                pprint(" " * 4 + "Type: Generic::Subnet")
                 finalString += " " * 4 + "Type: Generic::Subnet\n"
-                print(" " * 4 + "Properties:")
-                finalString += " " * 4 + "Properties:\n" + self.subnet(resource[i]["Properties"])
+                pprint(" " * 4 + "Properties:")
+                finalString += " " * 4 + "Properties:\n" + self.subnetToGeneric(resource[i]["Properties"])
             elif resource[i]["Type"] == "AWS::EC2::SecurityGroup":
-                print(" " * 4 + "Type: Generic::SecurityGroup")
+                pprint(" " * 4 + "Type: Generic::SecurityGroup")
                 finalString += " " * 4 + "Type: Generic::SecurityGroup\n"
-                print(" " * 4 + "Properties:")
-                finalString += " " * 4 + "Properties:\n" + self.securityGroup(resource[i]["Properties"])
+                pprint(" " * 4 + "Properties:")
+                finalString += " " * 4 + "Properties:\n" + self.securityGroupToGeneric(resource[i]["Properties"])
             elif resource[i]["Type"] == "AWS::Route53::RecordSet":
-                print(" " * 4 + "Type: Generic::DNSRecord")
+                pprint(" " * 4 + "Type: Generic::DNSRecord")
                 finalString += " " * 4 + "Type: Generic::DNSRecord\n"
-                print(" " * 4 + "Properties:")
-                finalString += " " * 4 + "Properties:\n" + self.dnsRecord(resource[i]["Properties"])
+                pprint(" " * 4 + "Properties:")
+                finalString += " " * 4 + "Properties:\n" + self.dnsRecordToGeneric(resource[i]["Properties"])
             else:
-                print(" " * 4 + "Type: Generic::Unknown")
+                pprint(" " * 4 + "Type: Generic::Unknown")
                 finalString += " " * 4 + "Type: Generic::Unknown\n"
-                print(" " * 4 + "Properties: Not Implemented")
+                pprint(" " * 4 + "Properties: Not Implemented")
                 finalString += " " * 4 + "Properties: Not implemented\n"
 
         # Converts YAML int JSON
         finalString = json.dumps(yaml.load(finalString), sort_keys=False, indent=2)
-        MainWindow.infoWindow("info", finalString)
-
-        #exit(0)
 
         return finalString
+
+    def saveToFile(self, paFile, paString):
+        raise NotImplemented
+
