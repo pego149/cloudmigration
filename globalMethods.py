@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 
 def pprint(*args, **kwargs):
-    printToConsole = 0
+    printToConsole = True
     if printToConsole:
         print(*args, **kwargs)
 

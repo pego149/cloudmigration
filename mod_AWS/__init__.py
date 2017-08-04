@@ -134,7 +134,6 @@ class AWS(GlobalMethods):
                     pprint(" " * 6 + "network: " + paAttribute[i])
                     string += " " * 6 + "network: " + paAttribute[i] + "\n"
 
-
             # IP subnet in CIDR format (192.168.1.0/24).
             elif i == "CidrBlock":
                 # Checks, if it is reference
@@ -347,8 +346,8 @@ class AWS(GlobalMethods):
 
             # Value of the RR
             elif i == "ResourceRecords":
-                #pprint(" " * 6 + "record: " + str(paAttribute[i]).replace("'", ""))
-                #string += " " * 6 + "record: " + str(paAttribute[i]).replace("'", "") + "\n"
+                # pprint(" " * 6 + "record: " + str(paAttribute[i]).replace("'", ""))
+                # string += " " * 6 + "record: " + str(paAttribute[i]).replace("'", "") + "\n"
 
                 pprint(" " * 6 + "records:")
                 string += " " * 6 + "records:\n"
@@ -419,7 +418,7 @@ class AWS(GlobalMethods):
     def readFromFile(self, paFile):
         """
         Method reads data from file passes as parameter. Data can be in two formats, JSON and YAML. It parses it, and
-        calls other methods, which parses smaller parts of given data. Finallz, it returns string in generic format.
+        calls other methods, which parses smaller parts of given data. Finally, it returns string in generic format.
         The string is formatted in JSON format.
         :param paFile: file to read data from
         :return: converted string in generic format, written in JSON
@@ -431,56 +430,58 @@ class AWS(GlobalMethods):
         # Reads data from file. It is smart, will read both: YAML and JSON.
         with open(paFile) as data_file:
             string = json.load(data_file)
-            #string = json.dumps(yaml.load(data_file), sort_keys=False, indent=2)
+            # string = json.dumps(yaml.load(data_file), sort_keys=False, indent=2)
 
         # Prints format of this template.
-        pprint("AWS Template Format: " + string["AWSTemplateFormatVersion"])
+        pprint("template_version: " + string["AWSTemplateFormatVersion"])
 
-        # Because of issues of date in JSON, it is pprinted with dots. Therefore it is recommended to check ity manually.
-        finalString += "Template_version: " + string["AWSTemplateFormatVersion"].replace("-", ".") + \
+        # Because of issues of date in JSON, it is printed with dots. Therefore it is recommended to check it manually.
+        finalString += "template_version: " + string["AWSTemplateFormatVersion"].replace("-", ".") + \
                        " - Please check and update manually\n"
 
         # Prints description of whole template.
-        pprint("Description: " + string["Description"] + "\n")
-        finalString += "Description: " + string["Description"] + "\n"
+        pprint("description: " + string["Description"] + "\n")
+        finalString += "description: " + string["Description"] + "\n"
 
         ###########################################################################################
         # PARAMETERS
         ###########################################################################################
 
-        pprint("Parameters:\n")
-        parameter = string["Parameters"]
-        finalString += "Parameters:\n"
+        pprint("parameters:\n")
+        finalString += "parameters:\n"
 
-        # Iterates all parameters and pprints them
+        parameter = string["Parameters"]
+
+        # Iterates all parameters and prints them
         for i in parameter:
             # Prints name of parameter.
-            pprint(i + ":")
-            finalString += "  " + i + ":\n"
+            pprint(" "*2 + i + ":")
+            finalString += " "*2 + i + ":\n"
 
             for attribute in parameter[i]:
-                # pprints name of attribute
-                pprint("  " + attribute + ": ", end='')
-                finalString += "    " + attribute + ": "
+                # prints name of attribute
+                # pprint(" "*4 + attribute + ": ", end='')
+                # finalString += " "*4 + attribute + ": "
 
-                # In these types of attributes, there is just simple pprint of original value.
+                # In these types of attributes, there is just simple print of original value.
                 if attribute == "Type" or attribute == "Description" or attribute == "Default" or \
                                 attribute == "MinLength" or attribute == "MaxLength" or \
                                 attribute == "ConstraintDescription":
-                    pprint(parameter[i][attribute])
-                    finalString += parameter[i][attribute] + "\n"
+                    pprint(" "*4 + attribute.lower() + ": " + parameter[i][attribute])
+                    finalString += " "*4 + attribute.lower() + ": " + parameter[i][attribute] + "\n"
 
-                # In Allowed pattern, there is Regex, which is pprinted with warning, that it should be checked manually.
+                # In Allowed pattern, there is Regex, which is printed with warning, that it should be checked manually.
                 elif attribute == "AllowedPattern":
-                    pprint(str(parameter[i][attribute]))
-                    finalString += "Check manually " + parameter[i][attribute] + "\n"
+                    pprint(" "*4 + attribute.lower() + ": " + str(parameter[i][attribute]))
+                    finalString += " "*4 + attribute.lower() + ": " + "Check manually " + parameter[i][attribute] + "\n"
 
-                # Allowed values are pprinted as a list.
+                # Allowed values are printed as a list.
                 elif attribute == "AllowedValues":
-                    pprint()
+                    pprint(" " * 4 + attribute.lower() + ":")
+                    finalString += " "*4 + attribute.lower() + ":\n"
                     for k in parameter[i][attribute]:
                         pprint(" " * 4 + "- " + k)
-                        finalString += "\n" + " " * 4 + "- " + k + "\n"
+                        finalString += " " * 4 + "- " + k + "\n"
 
                 # Else write, that it is not implemented yet.
                 else:
@@ -491,12 +492,12 @@ class AWS(GlobalMethods):
         # RESOURCES
         ###########################################################################################
 
-        pprint("\nResources:\n")
+        pprint("\nresources:\n")
+        finalString += "resources:\n"
         resource = string["Resources"]
-        finalString += "Resources:\n"
 
         for i in resource:
-            # pprints name of resource
+            # prints name of resource
             pprint("  " + i + ": ")
             finalString += "  " + i + ":\n"
 

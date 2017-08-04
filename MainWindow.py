@@ -85,10 +85,10 @@ def setWindowProperties(self, cloudTypes):
     comboOutputFormat.current(0)
 
     ##### test purposes
-    entryFrom.insert(0, "C:/Users/marek/Documents/cloud/puppetmaster.template")
-    entryTo.insert(0, 'C:/Users/marek/Documents/cloud/test-openstack.yaml')
-    comboInputFormat.current(1)
-    comboOutputFormat.current(2)
+    entryFrom.insert(0, "C:/Users/marek/Documents/cloud/test-openstack.yaml")
+    entryTo.insert(0, 'C:/Users/marek/Documents/cloud/test2.generic')
+    comboInputFormat.current(2)
+    comboOutputFormat.current(0)
     ######
 
     # last part, execute button

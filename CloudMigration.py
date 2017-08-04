@@ -1,7 +1,6 @@
 import MainWindow as MainWindow
 import tkinter as tk
 import glob
-import gc
 
 
 def doTransformation(fromFile, fromModule, toFile, toModule):
@@ -61,9 +60,6 @@ def showLoadableModules(paModules):
 
 # Main method
 if __name__ == "__main__":
-
-    # If set to 1, everything is printed to console
-    gc.set_debug(0)
 
     # Create main window
     root = tk.Tk()

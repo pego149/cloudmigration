@@ -1,6 +1,7 @@
 from globalMethods import GlobalMethods, pprint
 import MainWindow as MainWindow
 import json
+import yaml
 
 
 class OpenStack(GlobalMethods):
@@ -28,7 +29,7 @@ class OpenStack(GlobalMethods):
         return False
 
     ##########################################
-    # Attribute functions
+    # Attribute functions from generic
     ##########################################
 
     def instanceFromGeneric(self, paAttribute):
@@ -105,7 +106,7 @@ class OpenStack(GlobalMethods):
                 string += " " * 6 + "user_data:\n" + " " * 8 + "str_replace:\n" + " " * 10 + "template: |\n"
 
                 # Get all data from UserData.
-                string += " " * 12 + j
+                string += " " * 12 + str(paAttribute[i]["bare_data"]) + "\n"
                 pprint(" " * 12 + str(paAttribute[i]["bare_data"]))
 
                 # Print a section with parameters.
@@ -176,8 +177,10 @@ class OpenStack(GlobalMethods):
 
             # Availability zone property. OpenStack does not have it.
             elif i == "availability_zone":
-                pprint(" " * 6 + "# AvailabilityZone: does not have this property. Original: " + str(paAttribute[i]).replace("'", ""))
-                string += " " * 6 + "# AvailabilityZone: does not have this property. Original: " + str(paAttribute[i]).replace("'", "") + "\n"
+                pprint(" " * 6 + "# AvailabilityZone: does not have this property. Original: " +
+                       str(paAttribute[i]).replace("'", ""))
+                string += " " * 6 + "# AvailabilityZone: does not have this property. Original: " +\
+                          str(paAttribute[i]).replace("'", "") + "\n"
 
             # Tags properties. They are just list of values.
             elif i == "tags":
@@ -207,8 +210,10 @@ class OpenStack(GlobalMethods):
         for i in paAttribute:
             # IP subnet in CIDR format (192.168.1.0/24). OpenStack does not have it.
             if i == "cidr":
-                pprint(" " * 6 + "# cidr: does not have this property. Original: " + str(paAttribute[i]).replace("'", ""))
-                string += " " * 6 + "# cidr: does not have this property. Original: " + str(paAttribute[i]).replace("'", "") + "\n"
+                pprint(" " * 6 + "# cidr: does not have this property. Original: " +
+                       str(paAttribute[i]).replace("'", ""))
+                string += " " * 6 + "# cidr: does not have this property. Original: " + \
+                        str(paAttribute[i]).replace("'", "") + "\n"
 
             # Tags properties. They are just list of values.
             elif i == "tags":
@@ -314,17 +319,247 @@ class OpenStack(GlobalMethods):
         return string
 
     ##########################################
+    # Attribute functions to generic
+    ##########################################
+
+    @staticmethod
+    def networkToGeneric(paAttribute):
+        """
+        Method that transforms OpenStack network into Generic format in YAML.
+        :param paAttribute: properties of Generic network (OS::Neutron:Net) in JSON format
+        :return: string in YAML format
+        """
+
+        string = ""
+
+        for i in paAttribute:
+            # Name of network.
+            if i == "name":
+                pprint(" " * 6 + "name: " + paAttribute[i])
+                string += " " * 6 + "name: " + paAttribute[i] + "\n"
+
+            # Tags properties. They are just list of values.
+            elif i == "tags":
+                tagCount = 1
+                pprint(" " * 6 + "tags:")
+                string += " " * 6 + "tags: " + "\n"
+                for j in paAttribute[i]:
+                    pprint(" " * 8 + "tag" + tagCount + ": " + paAttribute[i][j])
+                    string += " " * 8 + "tag" + tagCount + ": " + paAttribute[i][j] + "\n"
+                    tagCount += 1
+
+            # Else write, that this property is not implemented yet.
+            else:
+                pprint(" " * 6 + i + ": Not implemented")
+                string += " " * 6 + i + ": Not implemented" + "\n"
+
+        return string
+
+    def subnetToGeneric(self, paAttribute):
+        """
+        Method that transforms OpenStack subnet into Generic format in YAML.
+        :param paAttribute: properties of Generic subnet (OS::Neutron::Subnet) in JSON format
+        :return: string in YAML format
+        """
+
+        string = ""
+
+        for i in paAttribute:
+            # Network, that Subnet is par of.
+            if i == "network":
+                # Checks, if it is reference
+                if isinstance(paAttribute[i], dict):
+                    pprint(" " * 6 + "network: { ref: " + paAttribute[i]["get_resource"] + " }")
+                    string += " " * 6 + "network: { ref: " + paAttribute[i]["get_resource"] + " }\n"
+                else:
+                    pprint(" " * 6 + "network: " + paAttribute[i])
+                    string += " " * 6 + "network: " + paAttribute[i] + "\n"
+
+            # IP subnet in CIDR format (192.168.1.0/24).
+            elif i == "cidr":
+                # Checks, if it is reference
+                if isinstance(paAttribute[i], dict):
+                    if self.isInParameters(paAttribute[i]["ref"]):
+                        pprint(" " * 6 + "cidr: { get_param: " + paAttribute[i]["ref"] + " }")
+                        string += " " * 6 + "cidr: { get_param: " + paAttribute[i]["ref"] + " }\n"
+                    else:
+                        pprint(" " * 6 + "cidr: { get_resource: " + paAttribute[i]["ref"] + " }")
+                        string += " " * 6 + "cidr: { get_resource: " + paAttribute[i]["ref"] + " }\n"
+                else:
+                    pprint(" " * 6 + "cidr: " + paAttribute[i])
+                    string += " " * 6 + "cidr: " + paAttribute[i] + "\n"
+
+            # Availability zone property. OpenStack does not have it.
+            elif i == "availability_zone":
+                pprint(" " * 6 + "# AvailabilityZone: does not have this property. Original: " +
+                       str(paAttribute[i]).replace("'", ""))
+                string += " " * 6 + "# AvailabilityZone: does not have this property. Original: " +\
+                          str(paAttribute[i]).replace("'", "") + "\n"
+
+            # Tags properties. They are just list of values.
+            elif i == "tags":
+                pprint(" " * 6 + "tags:")
+                string += " " * 6 + "tags: " + "\n"
+                for j in paAttribute[i]:
+                    pprint(" " * 8 + "- " + paAttribute[i][j])
+                    string += " " * 8 + "- " + paAttribute[i][j] + "\n"
+
+            # Else write, that this property is not implemented yet.
+            else:
+                pprint(" " * 6 + i + ": Not implemented")
+                string += " " * 6 + i + ": Not implemented" + "\n"
+
+        return string
+
+    ##########################################
     # Main functions
     ##########################################
 
     def readFromFile(self, paFile):
-        try:
-            file = open(paFile, 'r')
-        except IOError:
-            MainWindow.infoWindow("error", "Error in parsing YAML file - " + self.name)
-            return False
+        """
+        Method reads data from file passes as parameter. Data can be in YAML format only. It parses it, and
+        calls other methods, which parses smaller parts of given data. Finally, it returns string in generic format.
+        The string is formatted in JSON format.
+        :param paFile: file to read data from
+        :return: converted string in generic format, written in JSON
+        """
 
-        return file.read()
+        # This string is being filled with data and finally is returned from this function.
+        finalString = ""
+
+        # Reads data from file. It is smart, will read both: YAML and JSON.
+        with open(paFile) as data_file:
+            # string = json.load(data_file)
+            string = yaml.load(data_file)
+
+        # Prints format of this template.
+        pprint("template_version: " + string["heat_template_version"])
+
+        # Because of issues of date in JSON, it is printed with dots. Therefore it is recommended to check ity manually.
+        finalString += "template_version: " + string["heat_template_version"].replace("-", ".") + \
+                       " - Please check and update manually\n"
+
+        # Prints description of whole template.
+        pprint("description: " + string["description"] + "\n")
+        finalString += "description: " + string["description"] + "\n"
+
+        ###########################################################################################
+        # PARAMETERS
+        ###########################################################################################
+
+        pprint("parameters:\n")
+        finalString += "parameters:\n"
+        parameter = string["parameters"]
+
+        # Iterates all parameters and prints them
+        for i in parameter:
+            # Add parameter to list, in which are searched references (get_param)
+            self.aParameters.append(i)
+
+            # Prints name of parameter.
+            pprint(" " * 2 + i + ":")
+            finalString += " " * 2 + i + ":\n"
+
+            for attribute in parameter[i]:
+                # If there is empty parameter, skip it
+                if parameter[i][attribute] is None:
+                    continue
+
+                # In these types of attributes, there is just simple print of original value.
+                elif attribute == "type" or attribute == "description" or attribute == "default":
+                    pprint(" " * 4 + attribute + ": " + parameter[i][attribute])
+                    finalString += " " * 4 + attribute + ": " + parameter[i][attribute] + "\n"
+
+                # In these types of attributes, there is just simple print of original value.
+                elif attribute == "constraints":
+
+                    # Constraints is a list
+                    for j in parameter[i][attribute]:
+                        for k in j:
+                            if k == "allowed_pattern":
+                                pprint(" " * 4 + "allowedpattern: " + j[k])
+                                finalString += " " * 4 + "allowedpattern: " + j[k] + "\n"
+
+                            elif k == "allowed_values":
+                                pprint(" " * 4 + "allowedvalues:")
+                                finalString += " " * 4 + "allowedvalues:\n"
+
+                                # Write all values - it is a list
+                                for l in j[k]:
+                                    pprint(" " * 6 + "- " + l)
+                                    finalString += " " * 6 + "- " + l + "\n"
+
+                            elif k == "length":
+                                for l in j[k]:
+
+                                    if l == "min":
+                                        pprint(" " * 4 + "minlength: " + str(j[k][l]))
+                                        finalString += " " * 4 + "minlength: " + str(j[k][l]) + "\n"
+
+                                    else:
+                                        pprint(" " * 4 + "maxlength: " + str(j[k][l]))
+                                        finalString += " " * 4 + "maxlength: " + str(j[k][l]) + "\n"
+
+                            else:
+                                pprint(" " * 4 + k + ": Not implemented")
+                                finalString += " " * 4 + k + ": Not implemented\n"
+
+                # Else write, that it is not implemented yet.
+                else:
+                    pprint(" " * 4 + attribute.lower() + ": " + "Not implemented")
+                    finalString += " " * 4 + attribute.lower() + ": " + "Not Implemented\n"
+
+        exit(1)
+        ###########################################################################################
+        # RESOURCES
+        ###########################################################################################
+
+        pprint("\nResources:\n")
+        resource = string["Resources"]
+        finalString += "Resources:\n"
+
+        for i in resource:
+            # prints name of resource
+            pprint(" "*2 + i + ": ")
+            finalString += " "*2 + i + ":\n"
+
+            # Based on resource name, calls method which will transform property data.
+            if resource[i]["Type"] == "AWS::EC2::Instance":
+                pprint(" " * 4 + "Type: Generic::VirtualMachine")
+                finalString += " " * 4 + "Type: Generic::VirtualMachine\n"
+                pprint(" " * 4 + "Properties:")
+                finalString += " " * 4 + "Properties:\n" + self.instanceToGeneric(resource[i]["Properties"])
+            elif resource[i]["Type"] == "AWS::EC2::VPC":
+                pprint(" " * 4 + "Type: Generic::Network")
+                finalString += " " * 4 + "Type: Generic::Network\n"
+                pprint(" " * 4 + "Properties:")
+                finalString += " " * 4 + "Properties:\n" + self.networkToGeneric(resource[i]["Properties"])
+            elif resource[i]["Type"] == "AWS::EC2::Subnet":
+                pprint(" " * 4 + "Type: Generic::Subnet")
+                finalString += " " * 4 + "Type: Generic::Subnet\n"
+                pprint(" " * 4 + "Properties:")
+                finalString += " " * 4 + "Properties:\n" + self.subnetToGeneric(resource[i]["Properties"])
+            elif resource[i]["Type"] == "AWS::EC2::SecurityGroup":
+                pprint(" " * 4 + "Type: Generic::SecurityGroup")
+                finalString += " " * 4 + "Type: Generic::SecurityGroup\n"
+                pprint(" " * 4 + "Properties:")
+                finalString += " " * 4 + "Properties:\n" + self.securityGroupToGeneric(resource[i]["Properties"])
+            elif resource[i]["Type"] == "AWS::Route53::RecordSet":
+                pprint(" " * 4 + "Type: Generic::DNSRecord")
+                finalString += " " * 4 + "Type: Generic::DNSRecord\n"
+                pprint(" " * 4 + "Properties:")
+                finalString += " " * 4 + "Properties:\n" + self.dnsRecordToGeneric(resource[i]["Properties"])
+            else:
+                pprint(" " * 4 + "Type: Generic::Unknown")
+                finalString += " " * 4 + "Type: Generic::Unknown\n"
+                pprint(" " * 4 + "Properties: Not Implemented")
+                finalString += " " * 4 + "Properties: Not implemented\n"
+
+        # Converts YAML int JSON
+        finalString = json.dumps(yaml.load(finalString), sort_keys=False, indent=2)
+
+        exit(0)
+        return finalString
 
     def saveToFile(self, paFile, paString):
 
@@ -335,73 +570,119 @@ class OpenStack(GlobalMethods):
         finalString = ""
 
         # Prints format of this template.
-        pprint("heat_template_version: " + string["Template_version"])
+        pprint("heat_template_version: " + string["template_version"])
 
         # Because of issues of date in JSON, it is printed with dots. Therefore it is recommended to check ity manually.
-        finalString += "heat_template_version: " + string["Template_version"].replace("-", ".") + \
+        finalString += "heat_template_version: " + string["template_version"].replace("-", ".") + \
                        " - Please check and update manually\n"
 
         # Prints description of whole template.
-        pprint("description: " + string["Description"] + "\n")
-        finalString += "description: " + string["Description"] + "\n"
+        pprint("description: " + string["description"] + "\n")
+        finalString += "description: " + string["description"] + "\n"
 
         ###########################################################################################
         # PARAMETERS
         ###########################################################################################
 
         pprint("parameters:")
-        parameter = string["Parameters"]
         finalString += "parameters:\n"
+        parameter = string["parameters"]
 
         # Iterates all parameters and prints them
         for i in parameter:
-            # Add parameter to list
+            # Add parameter to list, in which are searched references (get_param)
             self.aParameters.append(i)
+
+            # Constraints section ######################
+            isConstraints = False
+            constraints = " "*4 + "constraints:\n"
+
+            isLength = False
+            lengthConstraint = " "*6 + "- length: {}\n"
+            # Constraints section ######################
 
             # Prints name of parameter.
             pprint(" "*2 + i + ":")
             finalString += " "*2 + i + ":\n"
 
             for attribute in parameter[i]:
-                # prints name of attribute
-                pprint(" "*4 + attribute + ": ", end='')
-                finalString += " "*4 + attribute + ": "
-
+                # If there is empty parameter, skip it
                 if parameter[i][attribute] is None:
-                    pprint()
-                    finalString += "\n"
+                    continue
 
-                # In these types of attributes, there is just simple pprint() of original value.
-                elif attribute == "Type" or attribute == "Description" or attribute == "Default" or \
-                                attribute == "MinLength" or attribute == "MaxLength" or \
-                                attribute == "ConstraintDescription":
-                    pprint(parameter[i][attribute])
-                    finalString += str(parameter[i][attribute]) + "\n"
+                # Type has to be lowercase
+                elif attribute == "type":
+                    pprint(" " * 4 + "type: " + parameter[i][attribute].lower())
+                    finalString += " " * 4 + "type: " + parameter[i][attribute].lower() + "\n"
+
+                # In these types of attributes, there is just simple print of original value.
+                elif attribute == "description" or attribute == "default":
+                    pprint(" " * 4 + attribute + ": " + parameter[i][attribute])
+                    finalString += " " * 4 + attribute + ": " + parameter[i][attribute] + "\n"
+
+                # In these types of attributes, there is just simple print of original value.
+                elif attribute == "minlength" or attribute == "maxlength":
+                    isConstraints = True
+
+                    if attribute == "minlength":
+                        if isLength:
+                            lengthConstraint = lengthConstraint[:-2] + ", min: " + str(parameter[i][attribute]) + "}\n"
+                        else:
+                            lengthConstraint = lengthConstraint[:-2] + " min: " + str(parameter[i][attribute]) + "}\n"
+
+                        isLength = True
+
+                    else:
+                        if isLength:
+                            lengthConstraint = lengthConstraint[:-2] + ", max: " + str(parameter[i][attribute]) + "}\n"
+                        else:
+                            lengthConstraint = lengthConstraint[:-2] + " max: " + str(parameter[i][attribute]) + "}\n"
+
+                        isLength = True
 
                 # In Allowed pattern, there is Regex, which is printed with warning, that it should be checked manually.
-                elif attribute == "AllowedPattern":
-                    pprint(str(parameter[i][attribute]))
-                    finalString += "Check manually " + parameter[i][attribute] + "\n"
+                elif attribute == "allowedpattern":
+                    isConstraints = True
+                    constraints += " "*6 + "- allowed_pattern: " + parameter[i][attribute] + " - Check manually\n"
 
                 # Allowed values are printed as a list.
-                elif attribute == "AllowedValues":
-                    pprint()
+                elif attribute == "allowedvalues":
+                    isConstraints = True
+                    constraints += " " * 6 + "- allowed_values:\n"
+
                     for k in parameter[i][attribute]:
-                        pprint(" " * 6 + "- " + k)
-                        finalString += "\n" + " " * 6 + "- " + k + "\n"
+                        constraints += " " * 8 + "- " + k + "\n"
+
+                elif attribute == "constraintdescription":
+                    pprint(" " * 4 + "# ConstraintDescription: does not have this attribute. Original: " +
+                           parameter[i][attribute])
+                    finalString += " " * 4 + "# ConstraintDescription: does not have this attribute. Original: " +\
+                                   parameter[i][attribute] + "\n"
 
                 # Else write, that it is not implemented yet.
                 else:
-                    pprint("Not implemented")
-                    finalString += "Not Implemented\n"
+                    pprint(" " * 4 + attribute.lower() + ": " + "Not implemented")
+                    finalString += " " * 4 + attribute.lower() + ": " + "Not Implemented\n"
+
+            # Append constraints, if any
+            if isConstraints:
+                pprint(constraints, end='')
+                finalString += constraints
+
+                if isLength:
+                    pprint(lengthConstraint)
+                    finalString += lengthConstraint + "\n"
+                else:
+                    pprint()
+                    finalString += "\n"
 
         ###########################################################################################
         # RESOURCES
         ###########################################################################################
 
         pprint("\nresources:\n")
-        resource = string["Resources"]
         finalString += "resources:\n"
+        resource = string["resources"]
 
         for i in resource:
             # prints name of resource
@@ -448,4 +729,3 @@ class OpenStack(GlobalMethods):
             MainWindow.infoWindow("error", "Error in saving file " + paFile)
 
         return finalString
-
