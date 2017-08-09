@@ -1,5 +1,6 @@
 from globalMethods import GlobalMethods
 import MainWindow as MainWindow
+import json, yaml
 
 
 class Generic(GlobalMethods):
@@ -12,12 +13,12 @@ class Generic(GlobalMethods):
 
     def readFromFile(self, paFile):
         try:
-            file = open(paFile, 'r')
-        except IOError:
-            MainWindow.infoWindow("error", "Error in parsing YAML file - " + self.name)
-            return False
+            with open(paFile) as data_file:
+                return data_file.read()
 
-        return file.read()
+        except IOError:
+            MainWindow.infoWindow("error", "Error in parsing JSON file - " + self.name)
+            return ""
 
     def saveToFile(self, paFile, paString):
         try:
