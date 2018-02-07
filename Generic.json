@@ -17,7 +17,7 @@
     "min_length": null,
     "max_length": null
   },
-
+//names used for searching, properties section added if type is not required in final template
   "resource_types": {
     "Generic::VM::Server": {
       "type": "Generic::VM::Server",
@@ -41,6 +41,7 @@
         "save_private_key": null,
         "public_key": null,
         "user": null
+        "tags": []
       }
     },
 
@@ -54,7 +55,8 @@
         "tags": []
       }
     },
-
+//todo ako sa spravaju rules? mozu byt samostatne alebo ako sucast security group
+//todo rule mozem vzdy v kode pridat do security group, musi mat aj direction, aj asociovanu security group
     "Generic::VM::SecurityGroupRule": {
       "type": "Generic::VM::SecurityGroupRule",
       "properties": {
@@ -62,7 +64,10 @@
         "protocol": null,
         "from_port": null,
         "to_port": null,
-        "cidr": null
+        "cidr": null,
+        "security_group": null,
+        "direction": null,
+        "tags": []
       }
     },
 
