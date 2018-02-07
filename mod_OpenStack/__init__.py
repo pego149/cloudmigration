@@ -5,7 +5,7 @@ from globalMethods import GlobalMethods, pprint
 import MainWindow as MainWindow
 import json
 import yaml
-
+# from ruamel.yaml import YAML as yaml
 
 class OpenStack(GlobalMethods):
 
@@ -694,83 +694,104 @@ class OpenStack(GlobalMethods):
         with open(paFile) as data_file:
             # string = json.load(data_file)
             string = yaml.load(data_file)
+            original_template = yaml.load(data_file)
+        with open("Generic.json", "r") as generic_file:
+            generic_template = json.load(generic_file)
 
+        new_template = original_template
+        new_template["template_version"] = original_template["heat_template_version"]
+        new_template["description"] = original_template["description"]
         # Prints format of this template.
-        pprint("template_version: " + string["heat_template_version"])
-
+        # pprint("template_version: " + string["heat_template_version"])
+        #
         # Because of issues of date in JSON, it is printed with dots. Therefore it is recommended to check ity manually.
-        finalString += "template_version: " + string["heat_template_version"].replace("-", ".") + \
-                       " - Please check and update manually\n"
+        # finalString += "template_version: " + string["heat_template_version"].replace("-", ".") + \
+        #                " - Please check and update manually\n"
 
         # Prints description of whole template.
-        pprint("description: " + string["description"] + "\n")
-        finalString += "description: " + string["description"] + "\n"
+        # pprint("description: " + string["description"] + "\n")
+        # finalString += "description: " + string["description"] + "\n"
 
         ###########################################################################################
         # PARAMETERS
         ###########################################################################################
 
-        pprint("parameters:\n")
-        finalString += "parameters:\n"
-        parameter = string["parameters"]
+        # pprint("parameters:\n")
+        # finalString += "parameters:\n"
+        # parameter = string["parameters"]
 
-        # Iterates all parameters and prints them
-        for i in parameter:
-            # Add parameter to list, in which are searched references (get_param)
-            self.aParameters.append(i)
+        for parameter in original_template["parameters"]:
+            new_template["parameters"][parameter] = dict(generic_template["parameter"])
+            new_template["parameters"][parameter]["type"] = parameter.get("type", None)
+            new_template["parameters"][parameter]["name"] = parameter.get("name", None)
+            new_template["parameters"][parameter]["default"] = parameter.get("default", None)
+            for constraint in parameter["constraints"]:
+                if "allowed_pattern" in constraint:
+                    new_template["parameters"][parameter]["allowed_pattern"] = constraint["allowed_pattern"]
+                elif "allowed_values" in constraint:
+                    new_template["parameters"][parameter]["allowed_values"] = constraint["allowed_values"]
+                elif "length" in constraint:
+                    new_template["parameters"][parameter]["min_length"] = constraint["length"].get("min", None)
+                    new_template["parameters"][parameter]["max_length"] = constraint["length"].get("max", None)
 
-            # Prints name of parameter.
-            pprint(" " * 2 + i + ":")
-            finalString += " " * 2 + i + ":\n"
-
-            for attribute in parameter[i]:
-                # If there is empty parameter, skip it
-                if parameter[i][attribute] is None:
-                    continue
-
-                # In these types of attributes, there is just simple print of original value.
-                elif attribute == "type" or attribute == "description" or attribute == "default":
-                    pprint(" " * 4 + attribute + ": " + parameter[i][attribute])
-                    finalString += " " * 4 + attribute + ": " + parameter[i][attribute] + "\n"
-
-                # In these types of attributes, there is just simple print of original value.
-                elif attribute == "constraints":
-
-                    # Constraints is a list
-                    for j in parameter[i][attribute]:
-                        for k in j:
-                            if k == "allowed_pattern":
-                                pprint(" " * 4 + "allowed_pattern: " + j[k])
-                                finalString += " " * 4 + "allowed_pattern: " + j[k] + "\n"
-
-                            elif k == "allowed_values":
-                                pprint(" " * 4 + "allowed_values:")
-                                finalString += " " * 4 + "allowed_values:\n"
-
-                                # Write all values - it is a list
-                                for l in j[k]:
-                                    pprint(" " * 6 + "- " + l)
-                                    finalString += " " * 6 + "- " + l + "\n"
-
-                            elif k == "length":
-                                for l in j[k]:
-
-                                    if l == "min":
-                                        pprint(" " * 4 + "min_length: " + str(j[k][l]))
-                                        finalString += " " * 4 + "min_length: " + str(j[k][l]) + "\n"
-
-                                    else:
-                                        pprint(" " * 4 + "max_length: " + str(j[k][l]))
-                                        finalString += " " * 4 + "max_length: " + str(j[k][l]) + "\n"
-
-                            else:
-                                pprint(" " * 4 + k + ": Not implemented")
-                                finalString += " " * 4 + k + ": Not implemented\n"
-
-                # Else write, that it is not implemented yet.
-                else:
-                    pprint(" " * 4 + attribute.lower() + ": " + "Not implemented")
-                    finalString += " " * 4 + attribute.lower() + ": " + "Not Implemented\n"
+        #todo check unimplemented parameters
+        # # Iterates all parameters and prints them
+        # for i in parameter:
+        #     # Add parameter to list, in which are searched references (get_param)
+        #     self.aParameters.append(i)
+        #
+        #     # Prints name of parameter.
+        #     pprint(" " * 2 + i + ":")
+        #     finalString += " " * 2 + i + ":\n"
+        #
+        #     for attribute in parameter[i]:
+        #         # If there is empty parameter, skip it
+        #         if parameter[i][attribute] is None:
+        #             continue
+        #
+        #         # In these types of attributes, there is just simple print of original value.
+        #         elif attribute == "type" or attribute == "description" or attribute == "default":
+        #             pprint(" " * 4 + attribute + ": " + parameter[i][attribute])
+        #             finalString += " " * 4 + attribute + ": " + parameter[i][attribute] + "\n"
+        #
+        #         # In these types of attributes, there is just simple print of original value.
+        #         elif attribute == "constraints":
+        #
+        #             # Constraints is a list
+        #             for j in parameter[i][attribute]:
+        #                 for k in j:
+        #                     if k == "allowed_pattern":
+        #                         pprint(" " * 4 + "allowed_pattern: " + j[k])
+        #                         finalString += " " * 4 + "allowed_pattern: " + j[k] + "\n"
+        #
+        #                     elif k == "allowed_values":
+        #                         pprint(" " * 4 + "allowed_values:")
+        #                         finalString += " " * 4 + "allowed_values:\n"
+        #
+        #                         # Write all values - it is a list
+        #                         for l in j[k]:
+        #                             pprint(" " * 6 + "- " + l)
+        #                             finalString += " " * 6 + "- " + l + "\n"
+        #
+        #                     elif k == "length":
+        #                         for l in j[k]:
+        #
+        #                             if l == "min":
+        #                                 pprint(" " * 4 + "min_length: " + str(j[k][l]))
+        #                                 finalString += " " * 4 + "min_length: " + str(j[k][l]) + "\n"
+        #
+        #                             else:
+        #                                 pprint(" " * 4 + "max_length: " + str(j[k][l]))
+        #                                 finalString += " " * 4 + "max_length: " + str(j[k][l]) + "\n"
+        #
+        #                     else:
+        #                         pprint(" " * 4 + k + ": Not implemented")
+        #                         finalString += " " * 4 + k + ": Not implemented\n"
+        #
+        #         # Else write, that it is not implemented yet.
+        #         else:
+        #             pprint(" " * 4 + attribute.lower() + ": " + "Not implemented")
+        #             finalString += " " * 4 + attribute.lower() + ": " + "Not Implemented\n"
 
         ###########################################################################################
         # RESOURCES

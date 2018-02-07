@@ -1,0 +1,95 @@
+//todo moznosti pre template version
+{
+  "template_structure": {
+    "template_version": null,
+    "description": null,
+    "parameters": {},
+    "resources": {}
+  },
+
+  "parameter": {
+    "type": null,
+    "name": null,
+    "default": null,
+    "description": null,
+    "allowed_pattern": null,
+    "allowed_values": null,
+    "min_length": null,
+    "max_length": null
+  },
+
+  "resource_types": {
+    "Generic::VM::Server": {
+      "type": "Generic::VM::Server",
+      "properties": {
+        "name": null,
+        "image": null,
+        "instance_type": null,
+        "security_groups": null,
+        "availability_zone": null,
+        "network": null,
+        "ssh_key": null,
+        "user_data": null,
+        "tags": []
+      }
+    },
+
+    "Generic::VM::SshKey": {
+      "type": "Generic::VM::SshKey",
+      "properties": {
+        "name": null,
+        "save_private_key": null,
+        "public_key": null,
+        "user": null
+      }
+    },
+
+    "Generic::VM::SecurityGroup":{
+      "type": "Generic::VM::SecurityGroup",
+      "properties": {
+        "name": null,
+        "description": null,
+        "ingress_rules": [],
+        "egress_rules": [],
+        "tags": []
+      }
+    },
+
+    "Generic::VM::SecurityGroupRule": {
+      "type": "Generic::VM::SecurityGroupRule",
+      "properties": {
+        "name": null,
+        "protocol": null,
+        "from_port": null,
+        "to_port": null,
+        "cidr": null
+      }
+    },
+
+    "Generic::Network::Net": {
+      "type": "Generic::Network::Net",
+      "properties": {
+        "name": null,
+        "cidr": null,
+        "tags": []
+      }
+    },
+
+    "Generic::Network::Subnet": {
+      "type": "Generic::Network::Subnet",
+      "properties": {
+        "cidr": null,
+        "network": null,
+        "name": null,
+        "dns": null,
+        "gateway": null,
+        "ip_version": null,
+        "tags": []
+      }
+    }
+  }
+}
+//todo tag resource
+//prechadzanie required a optional, ak je niektore required
+//null, zahuci to, required a optional by malo byt
+//v templatoch Openstack, AWS
