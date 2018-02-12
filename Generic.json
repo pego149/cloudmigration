@@ -18,41 +18,98 @@
     "max_length": null
   },
 //names used for searching, properties section added if type is not required in final template
-  "resource_types": {
+  "resources": {
     "Generic::VM::Server": {
       "type": "Generic::VM::Server",
       "properties": {
-        "name": null,
-        "image": null,
-        "instance_type": null,
-        "security_groups": null,
-        "availability_zone": null,
-        "network": null,
-        "ssh_key": null,
-        "user_data": null,
-        "tags": []
+        "name": {
+          "type": null,
+          "description": null
+        },
+        "image": {
+          "type": null,
+          "description": null
+        },
+        "instance_type": {
+          "type": null,
+          "description": null
+        },
+        "security_groups": {
+          "type": null,
+          "description": null
+        },
+        "availability_zone": {
+          "type": null,
+          "description": null
+        },
+        "network": {
+          "type": null,
+          "description": null
+        },
+        "ssh_key": {
+          "type": null,
+          "description": null
+        },
+        "user_data": {
+          "type": null,
+          "description": null
+        },
+        "tags": {
+          "type": null,
+          "description": null
+        }
       }
     },
 
     "Generic::VM::SshKey": {
       "type": "Generic::VM::SshKey",
       "properties": {
-        "name": null,
-        "save_private_key": null,
-        "public_key": null,
-        "user": null
-        "tags": []
+        "name": {
+          "type": null,
+          "description": null
+        },
+        "save_private_key": {
+          "type": null,
+          "description": null
+        },
+        "public_key": {
+          "type": null,
+          "description": null
+        },
+        "user": {
+          "type": null,
+          "description": null
+        },
+        "tags": {
+          "type": null,
+          "description": null
+        }
       }
     },
 
     "Generic::VM::SecurityGroup":{
       "type": "Generic::VM::SecurityGroup",
       "properties": {
-        "name": null,
-        "description": null,
-        "ingress_rules": [],
-        "egress_rules": [],
-        "tags": []
+        "name": {
+          "type": null,
+          "description": null
+        },
+        "description": {
+          "type": null,
+          "description": null
+        },
+        "ingress_rules": {
+          "type": null,
+          "description": null
+        },
+        "egress_rules": {
+          "type": null,
+          "description": null
+        },
+        "tags": {
+          "type": null,
+          "description": null
+        }
       }
     },
 //todo ako sa spravaju rules? mozu byt samostatne alebo ako sucast security group
@@ -60,36 +117,90 @@
     "Generic::VM::SecurityGroupRule": {
       "type": "Generic::VM::SecurityGroupRule",
       "properties": {
-        "name": null,
-        "protocol": null,
-        "from_port": null,
-        "to_port": null,
-        "cidr": null,
-        "security_group": null,
-        "direction": null,
-        "tags": []
+        "name": {
+          "type": null,
+          "description": null
+        },
+        "protocol": {
+          "type": null,
+          "description": null
+        },
+        "from_port": {
+          "type": null,
+          "description": null
+        },
+        "to_port": {
+          "type": null,
+          "description": null
+        },
+        "cidr": {
+          "type": null,
+          "description": null
+        },
+        "security_group": {
+          "type": null,
+          "description": null
+        },
+        "direction": {
+          "type": null,
+          "description": null
+        },
+        "tags": {
+          "type": null,
+          "description": null
+        }
       }
     },
 
     "Generic::Network::Net": {
       "type": "Generic::Network::Net",
       "properties": {
-        "name": null,
-        "cidr": null,
-        "tags": []
+        "name": {
+          "type": null,
+          "description": null
+        },
+        "cidr": {
+          "type": null,
+          "description": null
+        },
+        "tags": {
+          "type": null,
+          "description": null
+        }
       }
     },
 
     "Generic::Network::Subnet": {
       "type": "Generic::Network::Subnet",
       "properties": {
-        "cidr": null,
-        "network": null,
-        "name": null,
-        "dns": null,
-        "gateway": null,
-        "ip_version": null,
-        "tags": []
+        "cidr": {
+          "type": null,
+          "description": null
+        },
+        "network": {
+          "type": null,
+          "description": null
+        },
+        "name": {
+          "type": null,
+          "description": null
+        },
+        "dns": {
+          "type": null,
+          "description": null
+        },
+        "gateway": {
+          "type": null,
+          "description": null
+        },
+        "ip_version": {
+          "type": null,
+          "description": null
+        },
+        "tags": {
+          "type": null,
+          "description": null
+        }
       }
     }
   }

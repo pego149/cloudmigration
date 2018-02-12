@@ -698,7 +698,7 @@ class OpenStack(GlobalMethods):
         with open("Generic.json", "r") as generic_file:
             generic_template = json.load(generic_file)
 
-        new_template = original_template
+        new_template = generic_template["template_structure"]
         new_template["template_version"] = original_template["heat_template_version"]
         new_template["description"] = original_template["description"]
         # Prints format of this template.
@@ -797,52 +797,74 @@ class OpenStack(GlobalMethods):
         # RESOURCES
         ###########################################################################################
 
-        pprint("\nresources:\n")
-        resource = string["resources"]
-        finalString += "resources:\n"
+        # pprint("\nresources:\n")
+        # resource = string["resources"]
+        # finalString += "resources:\n"
 
-        for i in resource:
-            # prints name of resource
-            pprint(" "*2 + i + ": ")
-            finalString += " "*2 + i + ":\n"
-
-            # Based on resource name, calls method which will transform property data.
-            if resource[i]["type"] == "OS::Nova::Server":
-                pprint(" " * 4 + "type: Generic::VirtualMachine")
-                finalString += " " * 4 + "type: Generic::VirtualMachine\n"
-                pprint(" " * 4 + "properties:")
-                finalString += " " * 4 + "properties:\n" + self.instanceToGeneric(resource[i]["properties"])
-            elif resource[i]["type"] == "OS::Neutron::Net":
-                pprint(" " * 4 + "type: Generic::Network")
-                finalString += " " * 4 + "type: Generic::Network\n"
-                pprint(" " * 4 + "properties:")
-                finalString += " " * 4 + "properties:\n" + self.networkToGeneric(resource[i]["properties"])
-            elif resource[i]["type"] == "OS::Neutron::Subnet":
-                pprint(" " * 4 + "type: Generic::Subnet")
-                finalString += " " * 4 + "type: Generic::Subnet\n"
-                pprint(" " * 4 + "properties:")
-                finalString += " " * 4 + "properties:\n" + self.subnetToGeneric(resource[i]["properties"])
-            elif resource[i]["type"] == "OS::Neutron::SecurityGroup":
-                pprint(" " * 4 + "type: Generic::SecurityGroup")
-                finalString += " " * 4 + "type: Generic::SecurityGroup\n"
-                pprint(" " * 4 + "properties:")
-                finalString += " " * 4 + "properties:\n" + self.securityGroupToGeneric(resource[i]["properties"])
-            # elif resource[i]["type"] == "AWS::Route53::RecordSet":
-            #     pprint(" " * 4 + "type: Generic::DNSRecord")
-            #     finalString += " " * 4 + "type: Generic::DNSRecord\n"
-            #     pprint(" " * 4 + "properties:")
-            #     finalString += " " * 4 + "properties:\n" + self.dnsRecordToGeneric(resource[i]["properties"])
+        to_generic_dict = {
+            "OS::Nova::Server": "Generic::VM::Server",
+            "OS::Neutron::Net": "Generic::Network::Net",
+            "OS::Neutron::Subnet": "Generic::Network::Subnet",
+            "OS::Neutron::SecurityGroup": "Generic::Network::Subnet"
+        }
+        for resource in original_template["resources"]:
+            if resource["type"] == "OS::Nova::Server":
+                new_template["resources"][resource] = self.instanceToGeneric("Generic::VM::Server") #todo aky parameter
+            elif resource["type"] == "OS::Neutron::Net":
+                new_template["resources"][resource] = self.networkToGeneric("Generic::Network::Net")
+            elif resource["type"] == "OS::Neutron::Subnet":
+                new_template["resources"][resource] = self.subnetToGeneric("Generic::Network::Subnet")
+            elif resource["type"] == "OS::Neutron::SecurityGroup":
+                new_template["resources"][resource] = self.securityGroupToGeneric("Generic::VM::SecurityGroup")
             else:
-                pprint(" " * 4 + "type: Generic::Unknown")
-                finalString += " " * 4 + "type: Generic::Unknown\n"
-                pprint(" " * 4 + "properties: Not Implemented")
-                finalString += " " * 4 + "properties: Not implemented\n"
+                new_template["resources"][resource] = "{0} Not Implemented".format(resource)
+
+
+
+
+        # for i in resource:
+        #     # prints name of resource
+        #     pprint(" "*2 + i + ": ")
+        #     finalString += " "*2 + i + ":\n"
+        #
+        #     # Based on resource name, calls method which will transform property data.
+        #     if resource[i]["type"] == "OS::Nova::Server":
+        #         pprint(" " * 4 + "type: Generic::VirtualMachine")
+        #         finalString += " " * 4 + "type: Generic::VirtualMachine\n"
+        #         pprint(" " * 4 + "properties:")
+        #         finalString += " " * 4 + "properties:\n" + self.instanceToGeneric(resource[i]["properties"])
+        #     elif resource[i]["type"] == "OS::Neutron::Net":
+        #         pprint(" " * 4 + "type: Generic::Network")
+        #         finalString += " " * 4 + "type: Generic::Network\n"
+        #         pprint(" " * 4 + "properties:")
+        #         finalString += " " * 4 + "properties:\n" + self.networkToGeneric(resource[i]["properties"])
+        #     elif resource[i]["type"] == "OS::Neutron::Subnet":
+        #         pprint(" " * 4 + "type: Generic::Subnet")
+        #         finalString += " " * 4 + "type: Generic::Subnet\n"
+        #         pprint(" " * 4 + "properties:")
+        #         finalString += " " * 4 + "properties:\n" + self.subnetToGeneric(resource[i]["properties"])
+        #     elif resource[i]["type"] == "OS::Neutron::SecurityGroup":
+        #         pprint(" " * 4 + "type: Generic::SecurityGroup")
+        #         finalString += " " * 4 + "type: Generic::SecurityGroup\n"
+        #         pprint(" " * 4 + "properties:")
+        #         finalString += " " * 4 + "properties:\n" + self.securityGroupToGeneric(resource[i]["properties"])
+        #     # elif resource[i]["type"] == "AWS::Route53::RecordSet":
+        #     #     pprint(" " * 4 + "type: Generic::DNSRecord")
+        #     #     finalString += " " * 4 + "type: Generic::DNSRecord\n"
+        #     #     pprint(" " * 4 + "properties:")
+        #     #     finalString += " " * 4 + "properties:\n" + self.dnsRecordToGeneric(resource[i]["properties"])
+        #     else:
+        #         pprint(" " * 4 + "type: Generic::Unknown")
+        #         finalString += " " * 4 + "type: Generic::Unknown\n"
+        #         pprint(" " * 4 + "properties: Not Implemented")
+        #         finalString += " " * 4 + "properties: Not implemented\n"
 
         # Converts YAML int JSON
-        finalString = json.dumps(yaml.load(finalString), sort_keys=False, indent=2)
+
+        # finalString = json.dumps(yaml.load(finalString), sort_keys=False, indent=2)
 
         #exit(0)
-        return finalString
+        return new_template
 
     def saveToFile(self, paFile, paString):
         """
