@@ -1,0 +1,10 @@
+Implement in this order!!!
+1. Prepare basic schemas for OS and AWS
+ 1.1. Create global function setPropertyValue(paFrom, paTo)
+  1.1.1. Function will check value type of ingoing and outgoing property and determine how to fill it ("string", [], dict) - append, direct set...
+  1.1.2. Function will skip if parameter not implemented or special
+2. Figure out how generic template is stored and accessed by mods (loaded as variable in main method)
+3. Function calls for resources use resource type translation table (again, how is it accessed?)
+4. Initial template validation (call boto and openstack)
+5. Special function return type evaluation
+6. Deploy as API

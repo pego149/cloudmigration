@@ -23,39 +23,39 @@
       "type": "Generic::VM::Server",
       "properties": {
         "name": {
-          "type": null,
+          "type": "string",
           "description": null
         },
         "image": {
-          "type": null,
+          "type": "string",
           "description": null
         },
         "instance_type": {
-          "type": null,
+          "type": "string",
           "description": null
         },
         "security_groups": {
-          "type": null,
+          "type": [],
           "description": null
         },
         "availability_zone": {
-          "type": null,
+          "type": "string",
           "description": null
         },
-        "network": {
-          "type": null,
+        "networks": {
+          "type": [],
           "description": null
         },
         "ssh_key": {
-          "type": null,
+          "type": "string",
           "description": null
         },
         "user_data": {
-          "type": null,
+          "type": "special",
           "description": null
         },
         "tags": {
-          "type": null,
+          "type": [],
           "description": null
         }
       }
@@ -65,23 +65,23 @@
       "type": "Generic::VM::SshKey",
       "properties": {
         "name": {
-          "type": null,
+          "type": "string",
           "description": null
         },
         "save_private_key": {
-          "type": null,
+          "type": "string",
           "description": null
         },
         "public_key": {
-          "type": null,
+          "type": "string",
           "description": null
         },
         "user": {
-          "type": null,
+          "type": "string",
           "description": null
         },
         "tags": {
-          "type": null,
+          "type": [],
           "description": null
         }
       }
@@ -91,23 +91,23 @@
       "type": "Generic::VM::SecurityGroup",
       "properties": {
         "name": {
-          "type": null,
+          "type": "string",
           "description": null
         },
         "description": {
-          "type": null,
+          "type": "string",
           "description": null
         },
         "ingress_rules": {
-          "type": null,
+          "type": [],
           "description": null
         },
         "egress_rules": {
-          "type": null,
+          "type": [],
           "description": null
         },
         "tags": {
-          "type": null,
+          "type": [],
           "description": null
         }
       }
@@ -118,35 +118,36 @@
       "type": "Generic::VM::SecurityGroupRule",
       "properties": {
         "name": {
-          "type": null,
+          "type": :string,
           "description": null
         },
         "protocol": {
-          "type": null,
+          "type": "string",
           "description": null
         },
         "from_port": {
-          "type": null,
+          "type": "string",
           "description": null
         },
         "to_port": {
-          "type": null,
+          "type": "string",
           "description": null
         },
         "cidr": {
-          "type": null,
+          "type": "string",
           "description": null
         },
         "security_group": {
-          "type": null,
+          "type": "string",
           "description": null
         },
         "direction": {
-          "type": null,
-          "description": null
+          "type": "string",
+          "description": null,
+          "allowed_values": ["ingress", "egress"]
         },
         "tags": {
-          "type": null,
+          "type": [],
           "description": null
         }
       }
@@ -156,15 +157,15 @@
       "type": "Generic::Network::Net",
       "properties": {
         "name": {
-          "type": null,
+          "type": "string",
           "description": null
         },
         "cidr": {
-          "type": null,
+          "type": "string",
           "description": null
         },
         "tags": {
-          "type": null,
+          "type": [],
           "description": null
         }
       }
@@ -174,31 +175,31 @@
       "type": "Generic::Network::Subnet",
       "properties": {
         "cidr": {
-          "type": null,
+          "type": "string",
           "description": null
         },
         "network": {
-          "type": null,
+          "type": "string",
           "description": null
         },
         "name": {
-          "type": null,
+          "type": "string",
           "description": null
         },
         "dns": {
-          "type": null,
+          "type": "string",
           "description": null
         },
         "gateway": {
-          "type": null,
+          "type": "string",
           "description": null
         },
         "ip_version": {
-          "type": null,
+          "type": "string",
           "description": null
         },
         "tags": {
-          "type": null,
+          "type": [],
           "description": null
         }
       }

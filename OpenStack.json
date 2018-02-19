@@ -1,0 +1,61 @@
+{
+  "template_structure": {
+    "heat_template_version": null,
+    "description": null,
+    "parameters": {},
+    "resources": {}
+  },
+
+  "parameter": {
+    "type": null,
+    "description": null,
+    "default": null,
+    "length": {
+      "min": null,
+      "max": null
+    },
+    "allowed_pattern": null,
+    "allowed_values": null
+  },
+
+  "resources": {
+    "OS::Nova::Server": {
+      "type": "OS::Nova::Server",
+      "required": [],
+      "properties": {
+        "image": {
+          "type": "string",
+          "description": null
+        },
+        "key_name": {
+          "type": "string",
+          "description": null
+        },
+        "flavor": {
+          "type": "string",
+          "description": null
+        },
+        "networks": {
+          "type": [],
+          "description": null
+        },
+        "availability_zone": {
+          "type": "string",
+          "description": null
+        },
+        "security_groups": {
+          "type": [],
+          "description": null
+        },
+        "user_data": {
+          "type": "special",
+          "description": null
+        },
+        "tags": {
+          "type": [],
+          "description": null
+        }
+      }
+    }
+  }
+}
