@@ -1,0 +1,229 @@
+{
+  "template_structure": {
+    "AWSTemplateFormatVersion": null,
+    "Description": null,
+    "Parameters": {},
+    "Resources": {}
+  },
+
+  "parameter": {
+
+  },
+
+  "resources": {
+    "AWS::EC2::Instance": {
+      "Type": "AWS::EC2::Instance", //todo capital T in type??
+      "Properties": {
+        "ImageId": {
+          "type": "value",
+          "description": null
+        },
+        "KeyName": {
+          "type": "value",
+          "description": null
+        },
+        "InstanceType": {
+          "type": "value",
+          "description": null
+        },
+        "AvailabilityZone": {
+          "type": "value",
+          "description": null
+        },
+        "UserData": {
+          "type": "special",
+          "description": null
+        },
+        "Tags": {
+          "type": "special", //todo tags su special???
+          "description": null
+        }
+      }
+    },
+    "AWS::EC2::VPC": {
+      "Type": "AWS::EC2::VPC",
+      "Properties": {
+        "CidrBlock": {
+          "type": "value",
+          "description": null
+        },
+        "Tags": {
+          "type": "special", //todo tags su special???
+          "description": null
+        }
+      }
+    },
+    "AWS::EC2::Subnet": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "VpcId": {
+          "type": "value",
+          "description": null
+        },
+        "CidrBlock": {
+          "type": "value",
+          "description": null
+        },
+        "AvailabilityZone": {
+          "type": "value",
+          "description": null
+        },
+        "Tags": {
+          "type": "special", //todo tags su special???
+          "description": null
+        }
+      }
+    },
+    "AWS::EC2::SecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": {
+          "type": "value",
+          "description": null
+        },
+        "SecurityGroupIngress": {
+          "type": "special", //todo special or new resource, values go to special type
+          "description": null,
+          "values": [
+            {
+              "IpProtocol": {
+                "type": "value",
+                "description": null
+              },
+              "FromPort": {
+                "type": "value",
+                "description": null
+              },
+              "ToPort": {
+                "type": "value",
+                "description": null
+              },
+              "CidrIp": {
+                "type": "value",
+                "description": null
+              }
+            }
+          ]
+        },
+        "SecurityGroupEgress": {
+          "type": "special",
+          "description": null,
+          "values": [
+            {
+              "IpProtocol": {
+                "type": "value",
+                "description": null
+              },
+              "FromPort": {
+                "type": "value",
+                "description": null
+              },
+              "ToPort": {
+                "type": "value",
+                "description": null
+              },
+              "CidrIp": {
+                "type": "value",
+                "description": null
+              }
+            }
+          ]
+        },
+        "Tags": {
+          "type": "special", //todo tags su special???
+          "description": null
+        }
+      }
+    },
+    "AWS::EC2::SecurityGroupEgress": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "CidrIp" : {
+          "type": "value",
+          "description": null
+        },
+        "CidrIpv6": {
+          "type": "value",
+          "description": null
+        },
+        "Description": {
+          "type": "value",
+          "description": null
+        },
+        "DestinationPrefixListId": {
+          "type": "value",
+          "description": null
+        },
+        "DestinationSecurityGroupId": {
+          "type": "value",
+          "description": null
+        },
+        "FromPort": {
+          "type": "value",
+          "description": null
+        },
+        "GroupId": {
+          "type": "value",
+          "description": null
+        },
+        "IpProtocol": {
+          "type": "value",
+          "description": null
+        },
+        "ToPort": {
+          "type": "value",
+          "description": null
+        }
+      }
+    },
+    "AWS::EC2::SecurityGroupIngress": {
+      "Type" : "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "CidrIp" : {
+          "type": "value",
+          "description": null
+        },
+        "CidrIpv6": {
+          "type": "value",
+          "description": null
+        },
+        "Description": {
+          "type": "value",
+          "description": null
+        },
+        "FromPort": {
+          "type": "value",
+          "description": null
+        },
+        "GroupId": {
+          "type": "value",
+          "description": null
+        },
+        "GroupName": {
+          "type": "value",
+          "description": null
+        },
+        "IpProtocol": {
+          "type": "value",
+          "description": null
+        },
+        "SourceSecurityGroupName": {
+          "type": "value",
+          "description": null
+        },
+        "SourceSecurityGroupId": {
+          "type": "value",
+          "description": null
+        },
+        "SourceSecurityGroupOwnerId": {
+          "type": "value",
+          "description": null
+        },
+        "ToPort": {
+          "type": "value",
+          "description": null
+        }
+      }
+    }
+  }
+}

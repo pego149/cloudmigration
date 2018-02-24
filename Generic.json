@@ -23,15 +23,15 @@
       "type": "Generic::VM::Server",
       "properties": {
         "name": {
-          "type": "string",
+          "type": "value",
           "description": null
         },
         "image": {
-          "type": "string",
+          "type": "value",
           "description": null
         },
         "instance_type": {
-          "type": "string",
+          "type": "value",
           "description": null
         },
         "security_groups": {
@@ -39,7 +39,7 @@
           "description": null
         },
         "availability_zone": {
-          "type": "string",
+          "type": "value",
           "description": null
         },
         "networks": {
@@ -47,7 +47,7 @@
           "description": null
         },
         "ssh_key": {
-          "type": "string",
+          "type": "value",
           "description": null
         },
         "user_data": {
@@ -65,19 +65,19 @@
       "type": "Generic::VM::SshKey",
       "properties": {
         "name": {
-          "type": "string",
+          "type": "value",
           "description": null
         },
         "save_private_key": {
-          "type": "string",
+          "type": "value",
           "description": null
         },
         "public_key": {
-          "type": "string",
+          "type": "value",
           "description": null
         },
         "user": {
-          "type": "string",
+          "type": "value",
           "description": null
         },
         "tags": {
@@ -91,20 +91,60 @@
       "type": "Generic::VM::SecurityGroup",
       "properties": {
         "name": {
-          "type": "string",
+          "type": "value",
           "description": null
         },
         "description": {
-          "type": "string",
+          "type": "value",
           "description": null
         },
         "ingress_rules": {
-          "type": [],
-          "description": null
+          "type": "special",
+          "description": null,
+          "values": [
+            {
+              "protocol": { //todo vytvorit tabulky prekladove tabulky pre special?
+                "type": "value",
+                "description": null
+              },
+              "from_port": {
+                "type": "value",
+                "description": null
+              },
+              "to_port": {
+                "type": "value",
+                "description": null
+              },
+              "cidr": {
+                "type": "value",
+                "description": null
+              }
+            }
+          ]
         },
         "egress_rules": {
-          "type": [],
-          "description": null
+          "type": "special",
+          "description": null,
+          "values": [
+            {
+              "protocol": { //todo vytvorit tabulky prekladove tabulky pre special?
+                "type": "value",
+                "description": null
+              },
+              "from_port": {
+                "type": "value",
+                "description": null
+              },
+              "to_port": {
+                "type": "value",
+                "description": null
+              },
+              "cidr": {
+                "type": "value",
+                "description": null
+              }
+            }
+          ]
         },
         "tags": {
           "type": [],
@@ -118,31 +158,31 @@
       "type": "Generic::VM::SecurityGroupRule",
       "properties": {
         "name": {
-          "type": :string,
+          "type": "value",
           "description": null
         },
         "protocol": {
-          "type": "string",
+          "type": "value",
           "description": null
         },
         "from_port": {
-          "type": "string",
+          "type": "value",
           "description": null
         },
         "to_port": {
-          "type": "string",
+          "type": "value",
           "description": null
         },
         "cidr": {
-          "type": "string",
+          "type": "value",
           "description": null
         },
         "security_group": {
-          "type": "string",
+          "type": "value",
           "description": null
         },
         "direction": {
-          "type": "string",
+          "type": "value",
           "description": null,
           "allowed_values": ["ingress", "egress"]
         },
@@ -157,11 +197,11 @@
       "type": "Generic::Network::Net",
       "properties": {
         "name": {
-          "type": "string",
+          "type": "value",
           "description": null
         },
         "cidr": {
-          "type": "string",
+          "type": "value",
           "description": null
         },
         "tags": {
@@ -175,27 +215,27 @@
       "type": "Generic::Network::Subnet",
       "properties": {
         "cidr": {
-          "type": "string",
+          "type": "value",
           "description": null
         },
         "network": {
-          "type": "string",
+          "type": "value",
           "description": null
         },
         "name": {
-          "type": "string",
+          "type": "value",
           "description": null
         },
         "dns": {
-          "type": "string",
+          "type": "value",
           "description": null
         },
         "gateway": {
-          "type": "string",
+          "type": "value",
           "description": null
         },
         "ip_version": {
-          "type": "string",
+          "type": "value",
           "description": null
         },
         "tags": {

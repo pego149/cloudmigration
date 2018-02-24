@@ -1,10 +1,15 @@
 Implement in this order!!!
 1. Prepare basic schemas for OS and AWS
- 1.1. Create global function setPropertyValue(paFrom, paTo)
+ 1.1. Create global function setResourceProperties(paFromType, paFromProperties, paToType, paToProperties)
   1.1.1. Function will check value type of ingoing and outgoing property and determine how to fill it ("string", [], dict) - append, direct set...
   1.1.2. Function will skip if parameter not implemented or special
-2. Figure out how generic template is stored and accessed by mods (loaded as variable in main method)
-3. Function calls for resources use resource type translation table (again, how is it accessed?)
-4. Initial template validation (call boto and openstack)
-5. Special function return type evaluation
-6. Deploy as API
+  1.1.3. Kde to zapisat???
+  1.1.4. Type special only if it has to be handled by code, if values cen be assigned directly, create another resource type in template
+  1.1.5. List has to have value type of value in it
+  1.1.6. If something in lower level is special, the entire thing is special and handled in function for resource
+2. Design program structura
+ 2.1. Figure out how generic template is stored and accessed by mods (loaded as variable in main method)
+ 2.2. Function calls for resources use resource type translation table (again, how is it accessed?)
+3. Initial template validation (call boto and openstack)
+4. Special function return type evaluation
+5. Deploy as API
