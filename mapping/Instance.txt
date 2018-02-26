@@ -1,0 +1,3 @@
+Generic	Generic::VM::Server	name	image	instance_type	security_groups	availability_zone	networks	networks	ssh_key	user_data	tags
+OpenStack	OS::Nova::Server	name	image	flavor	security_groups	availability_zone	networks	networks	key_name	user_data	tags
+AWS	AWS::EC2::Instance	-	ImageId	InstanceType	SecurityGroupIds	AvailabilityZone	SubnetId	NetworkInterfaces	KeyName	UserData	Tags

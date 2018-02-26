@@ -1,0 +1,3 @@
+Generic	Generic::VM::SshKey	name	save_private_key	public_key	user
+OpenStack	OS::Nova::KeyPair	name	save_private_key	public_key	user
+AWS	-	-	-	-	-

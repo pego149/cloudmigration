@@ -1,0 +1,236 @@
+{
+  "platforms": {
+    "Generic": [
+      "Generic::VM::Server", 
+      "Generic::Network::Net", 
+      "Generic::VM::SecurityGroup", 
+      "Generic::VM::SecurityGroupRule", 
+      "Generic::VM::SecurityGroupRule", 
+      "Generic::VM::SshKey", 
+      "Generic::Network::Subnet"
+    ], 
+    "OpenStack": [
+      "OS::Nova::Server", 
+      "OS::Neutron::Net", 
+      "OS::Neutron::SecurityGroup", 
+      "OS::Neutron::SecurityGroupRule", 
+      "OS::Neutron::SecurityGroupRule", 
+      "OS::Nova::KeyPair", 
+      "OS::Neutron::Subnet"
+    ], 
+    "AWS": [
+      "AWS::EC2::Instance", 
+      "AWS::EC2::VPC", 
+      "AWS::EC2::SecurityGroup", 
+      "AWS::EC2::SecurityGroupIngress", 
+      "AWS::EC2::SecurityGroupEgress", 
+      "-", 
+      "AWS::EC2::Subnet"
+    ]
+  }, 
+  "resources": {
+    "AWS::EC2::Instance": [
+      [
+        "-", 
+        "ImageId", 
+        "InstanceType", 
+        "SecurityGroupIds", 
+        "AvailabilityZone", 
+        "SubnetId", 
+        "NetworkInterfaces", 
+        "KeyName", 
+        "UserData", 
+        "Tags"
+      ]
+    ], 
+    "OS::Neutron::Net": [
+      [
+        "name", 
+        "-", 
+        "-", 
+        "-", 
+        "tags"
+      ]
+    ], 
+    "OS::Neutron::Subnet": [
+      [
+        "name", 
+        "network", 
+        "cidr", 
+        "dns_nameservers", 
+        "gateway_ip", 
+        "ip_version", 
+        "enable_dhcp", 
+        "-", 
+        "tags"
+      ]
+    ], 
+    "OS::Nova::Server": [
+      [
+        "name", 
+        "image", 
+        "flavor", 
+        "security_groups", 
+        "availability_zone", 
+        "networks", 
+        "networks", 
+        "key_name", 
+        "user_data", 
+        "tags"
+      ]
+    ], 
+    "AWS::EC2::Subnet": [
+      [
+        "-", 
+        "VpcId", 
+        "CidrBlock", 
+        "-", 
+        "-", 
+        "-", 
+        "-", 
+        "AvailabilityZone", 
+        "Tags"
+      ]
+    ], 
+    "AWS::EC2::SecurityGroupEgress": [
+      [
+        "GroupName", 
+        "Description", 
+        "-", 
+        "IpProtocol", 
+        "FromPort", 
+        "ToPort", 
+        "CidrIp", 
+        "GroupId", 
+        "-"
+      ]
+    ], 
+    "OS::Neutron::SecurityGroupRule": [
+      [
+        "-", 
+        "description", 
+        "direction", 
+        "protocol", 
+        "port_range_min", 
+        "port_range_max", 
+        "remote_ip_prefix", 
+        "security_group", 
+        "-"
+      ]
+    ], 
+    "Generic::VM::SshKey": [
+      [
+        "name", 
+        "save_private_key", 
+        "public_key", 
+        "user"
+      ]
+    ], 
+    "Generic::Network::Subnet": [
+      [
+        "name", 
+        "network", 
+        "cidr", 
+        "dns", 
+        "gateway", 
+        "ip_version", 
+        "enable_dhcp", 
+        "availability_zone", 
+        "tags"
+      ]
+    ], 
+    "OS::Neutron::SecurityGroup": [
+      [
+        "name", 
+        "description", 
+        "rules", 
+        "rules", 
+        "-"
+      ]
+    ], 
+    "Generic::Network::Net": [
+      [
+        "name", 
+        "cidr", 
+        "subnets", 
+        "availability_zone", 
+        "tags"
+      ]
+    ], 
+    "AWS::EC2::SecurityGroupIngress": [
+      [
+        "GroupName", 
+        "Description", 
+        "-", 
+        "IpProtocol", 
+        "FromPort", 
+        "ToPort", 
+        "CidrIp", 
+        "GroupId", 
+        "-"
+      ]
+    ], 
+    "Generic::VM::SecurityGroup": [
+      [
+        "name", 
+        "description", 
+        "ingress_rules", 
+        "egress_rules", 
+        "tags"
+      ]
+    ], 
+    "OS::Nova::KeyPair": [
+      [
+        "name", 
+        "save_private_key", 
+        "public_key", 
+        "user"
+      ]
+    ], 
+    "AWS::EC2::VPC": [
+      [
+        "-", 
+        "CidrBlock", 
+        "-", 
+        "AvailabilityZone", 
+        "Tags"
+      ]
+    ], 
+    "Generic::VM::Server": [
+      [
+        "name", 
+        "image", 
+        "instance_type", 
+        "security_groups", 
+        "availability_zone", 
+        "networks", 
+        "networks", 
+        "ssh_key", 
+        "user_data", 
+        "tags"
+      ]
+    ], 
+    "Generic::VM::SecurityGroupRule": [
+      [
+        "name", 
+        "description", 
+        "direction", 
+        "protocol", 
+        "from_port", 
+        "to_port", 
+        "cidr", 
+        "security_group", 
+        "tags"
+      ]
+    ], 
+    "AWS::EC2::SecurityGroup": [
+      [
+        "GroupName", 
+        "GroupDescription", 
+        "SecurityGroupIngress", 
+        "SecurityGroupEgress", 
+        "Tags"
+      ]
+    ]
+  }
+}

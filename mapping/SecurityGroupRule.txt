@@ -1,0 +1,4 @@
+Generic	Generic::VM::SecurityGroupRule	name	description	direction	protocol	from_port	to_port	cidr	security_group	tags
+OpenStack	OS::Neutron::SecurityGroupRule	-	description	direction	protocol	port_range_min	port_range_max	remote_ip_prefix	security_group	-
+AWS	AWS::EC2::SecurityGroupIngress	GroupName	Description	-	IpProtocol	FromPort	ToPort	CidrIp	GroupId	-
+AWS	AWS::EC2::SecurityGroupEgress	GroupName	Description	-	IpProtocol	FromPort	ToPort	CidrIp	GroupId	-
