@@ -43,7 +43,7 @@
           "description": null
         },
         "networks": {
-          "type": [],
+          "type": "special",
           "description": null
         },
         "ssh_key": {
@@ -204,6 +204,10 @@
           "type": "value",
           "description": null
         },
+        "availability_zone": {
+          "type": "value",
+          "description": null
+        },
         "tags": {
           "type": [],
           "description": null
@@ -235,6 +239,14 @@
           "description": null
         },
         "ip_version": {
+          "type": "value",
+          "description": null
+        },
+        "availability_zone": {
+          "type": "value",
+          "description": null
+        },
+        "enable_dhcp": {
           "type": "value",
           "description": null
         },

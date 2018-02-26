@@ -36,7 +36,7 @@
           "description": null
         },
         "networks": {
-          "type": [],
+          "type": "special",
           "description": null
         },
         "availability_zone": {
