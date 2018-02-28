@@ -1,0 +1,32 @@
+Postup programu
+1. Spustenie programu
+1.1. Naloadovanie schem a prekladoveho slovnik
+1.2. Spustenie stranky/GUI
+
+2. Nahranie vsupnych informacii
+2.1. Nastavenie vstupneho a vystupneho formatu
+2.2. Nahranie vstupneho template
+
+3. Preklad
+3.1. Nahranie vstupneho modulu
+3.2. Preklad do generickeho template
+3.2.1. Nahranie zakladnej struktury vystupneho template
+3.2.2. Vyplnenie template_version a description vo vystupnom template
+3.2.3. Preklad parametrov (metoda v jednotlivych modulova module?)
+3.2.4. Preklad resourcov
+3.2.4.1. Preklad nazvu resource (globalna metoda vyuzivajuca prekladovy slovnik okrem specialnych pripadov, napr. SecurityGroupIngress/Egress)
+3.2.4.2. Vytvorenie resource v novom template, nastavenie typu
+3.2.4.3. Nastavenie properties (globalna metoda vyuzivajuca prekladovy slovnik a schemy okrem specialnych pripadov)
+3.2.5. Preklad referencii a specialnych funkcii
+
+3.3. Preklad z generickeho template
+3.3.1. Nahranie zakladnej struktury vystupneho template
+3.3.2. Vyplnenie template_version a description vo vystupnom template
+3.3.3. Preklad parametrov (metoda v module?)
+3.3.4. Preklad resourcov
+3.3.4.1. Preklad nazvu resource (globalna metoda vyuzivajuca prekladovy slovnik okrem specialnych pripadov, napr. SecurityGroupIngress/Egress)
+3.3.4.2. Vytvorenie resource v novom template, nastavenie typu
+3.3.4.3. Nastavenie properties (globalna metoda vyuzivajuca prekladovy slovnik a schemy okrem specialnych pripadov)
+3.3.5. Preklad referencii a specialnych funkcii
+
+4. Vratenie vysledku
