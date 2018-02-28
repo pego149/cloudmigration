@@ -7,9 +7,10 @@ Implement in this order!!!
   1.1.4. Type special only if it has to be handled by code, if values cen be assigned directly, create another resource type in template
   1.1.5. List has to have value type of value in it
   1.1.6. If something in lower level is special, the entire thing is special and handled in function for resource
-2. Design program structura
+2. Design program structure
  2.1. Figure out how generic template is stored and accessed by mods (loaded as variable in main method)
  2.2. Function calls for resources use resource type translation table (again, how is it accessed?)
+ 2.3. Rename modules(get rid of mod_), use __import__('module', fromlist=[]) to dynamically import, import all at once or on demand
 3. Initial template validation (call boto and openstack)
 4. Special function return type evaluation
 5. Deploy as API
