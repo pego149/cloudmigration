@@ -45,12 +45,12 @@ class Translation:
     def translate(self):
         if self.from_platform == self.to_platform:
             self.to_template = self.from_template
-        else:
+        if self.from_platform != "Generic":
             from_module = self.loader.translation_modules[self.from_platform](self.loader.schemas(self.from_platform), self.loader.schemas("Generic"))
             self.to_template = from_module.toGeneric(self.from_template, self.loader.mapper)
-            if self.to_platform != "Generic":
-                to_module = self.loader.translation_modules[self.to_platform](self.loader.schemas("Generic"), self.loader.schemas(self.to_platform))
-                self.to_template = to_module.fromGeneric(self.from_template, self.loader.mapper)
+        if self.to_platform != "Generic":
+            to_module = self.loader.translation_modules[self.to_platform](self.loader.schemas("Generic"), self.loader.schemas(self.to_platform))
+            self.to_template = to_module.fromGeneric(self.from_template, self.loader.mapper)
         return self.to_template
 
     # def translate(self, paFromPlatform=None, paFromTemplate=None, paToPlatform=None, paLoader=None):
