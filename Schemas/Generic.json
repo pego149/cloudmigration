@@ -1,0 +1,258 @@
+{
+  "template_structure": {
+    "template_version": null,
+    "description": null,
+    "parameters": {},
+    "resources": {}
+  },
+
+  "parameter": {
+    "type": null,
+    "name": null,
+    "default": null,
+    "description": null,
+    "allowed_pattern": null,
+    "allowed_values": null,
+    "min_length": null,
+    "max_length": null
+  },
+  "resources": {
+    "Generic::VM::Server": {
+      "type": "Generic::VM::Server",
+      "properties": {
+        "name": {
+          "type": "value",
+          "description": null
+        },
+        "image": {
+          "type": "value",
+          "description": null
+        },
+        "instance_type": {
+          "type": "value",
+          "description": null
+        },
+        "security_groups": {
+          "type": [],
+          "description": null
+        },
+        "availability_zone": {
+          "type": "value",
+          "description": null
+        },
+        "networks": {
+          "type": "special",
+          "description": null
+        },
+        "ssh_key": {
+          "type": "value",
+          "description": null
+        },
+        "user_data": {
+          "type": "special",
+          "description": null
+        },
+        "tags": {
+          "type": [],
+          "description": null
+        }
+      }
+    },
+
+    "Generic::VM::SshKey": {
+      "type": "Generic::VM::SshKey",
+      "properties": {
+        "name": {
+          "type": "value",
+          "description": null
+        },
+        "save_private_key": {
+          "type": "value",
+          "description": null
+        },
+        "public_key": {
+          "type": "value",
+          "description": null
+        },
+        "user": {
+          "type": "value",
+          "description": null
+        },
+        "tags": {
+          "type": [],
+          "description": null
+        }
+      }
+    },
+
+    "Generic::VM::SecurityGroup":{
+      "type": "Generic::VM::SecurityGroup",
+      "properties": {
+        "name": {
+          "type": "value",
+          "description": null
+        },
+        "description": {
+          "type": "value",
+          "description": null
+        },
+        "ingress_rules": {
+          "type": "special",
+          "description": null,
+          "values": [
+            {
+              "protocol": {
+                "type": "value",
+                "description": null
+              },
+              "from_port": {
+                "type": "value",
+                "description": null
+              },
+              "to_port": {
+                "type": "value",
+                "description": null
+              },
+              "cidr": {
+                "type": "value",
+                "description": null
+              }
+            }
+          ]
+        },
+        "egress_rules": {
+          "type": "special",
+          "description": null,
+          "values": [
+            {
+              "protocol": {
+                "type": "value",
+                "description": null
+              },
+              "from_port": {
+                "type": "value",
+                "description": null
+              },
+              "to_port": {
+                "type": "value",
+                "description": null
+              },
+              "cidr": {
+                "type": "value",
+                "description": null
+              }
+            }
+          ]
+        },
+        "tags": {
+          "type": [],
+          "description": null
+        }
+      }
+    },
+
+    "Generic::VM::SecurityGroupRule": {
+      "type": "Generic::VM::SecurityGroupRule",
+      "properties": {
+        "name": {
+          "type": "value",
+          "description": null
+        },
+        "protocol": {
+          "type": "value",
+          "description": null
+        },
+        "from_port": {
+          "type": "value",
+          "description": null
+        },
+        "to_port": {
+          "type": "value",
+          "description": null
+        },
+        "cidr": {
+          "type": "value",
+          "description": null
+        },
+        "security_group": {
+          "type": "value",
+          "description": null
+        },
+        "direction": {
+          "type": "value",
+          "description": null,
+          "allowed_values": ["ingress", "egress"]
+        },
+        "tags": {
+          "type": [],
+          "description": null
+        }
+      }
+    },
+
+    "Generic::Network::Net": {
+      "type": "Generic::Network::Net",
+      "properties": {
+        "name": {
+          "type": "value",
+          "description": null
+        },
+        "cidr": {
+          "type": "value",
+          "description": null
+        },
+        "availability_zone": {
+          "type": "value",
+          "description": null
+        },
+        "tags": {
+          "type": [],
+          "description": null
+        }
+      }
+    },
+
+    "Generic::Network::Subnet": {
+      "type": "Generic::Network::Subnet",
+      "properties": {
+        "cidr": {
+          "type": "value",
+          "description": null
+        },
+        "network": {
+          "type": "value",
+          "description": null
+        },
+        "name": {
+          "type": "value",
+          "description": null
+        },
+        "dns": {
+          "type": "value",
+          "description": null
+        },
+        "gateway": {
+          "type": "value",
+          "description": null
+        },
+        "ip_version": {
+          "type": "value",
+          "description": null
+        },
+        "availability_zone": {
+          "type": "value",
+          "description": null
+        },
+        "enable_dhcp": {
+          "type": "value",
+          "description": null
+        },
+        "tags": {
+          "type": [],
+          "description": null
+        }
+      }
+    }
+  }
+}
+

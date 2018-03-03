@@ -1,264 +1,241 @@
-//todo moznosti pre template version
 {
   "template_structure": {
-    "template_version": null,
-    "description": null,
-    "parameters": {},
-    "resources": {}
+    "AWSTemplateFormatVersion": null,
+    "Description": null,
+    "Parameters": {},
+    "Resources": {}
   },
 
   "parameter": {
-    "type": null,
-    "name": null,
-    "default": null,
-    "description": null,
-    "allowed_pattern": null,
-    "allowed_values": null,
-    "min_length": null,
-    "max_length": null
+
   },
-//names used for searching, properties section added if type is not required in final template
+
   "resources": {
-    "Generic::VM::Server": {
-      "type": "Generic::VM::Server",
-      "properties": {
-        "name": {
+    "AWS::EC2::Instance": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "ImageId": {
           "type": "value",
           "description": null
         },
-        "image": {
+        "KeyName": {
           "type": "value",
           "description": null
         },
-        "instance_type": {
+        "InstanceType": {
           "type": "value",
           "description": null
         },
-        "security_groups": {
-          "type": [],
-          "description": null
-        },
-        "availability_zone": {
+        "AvailabilityZone": {
           "type": "value",
           "description": null
         },
-        "networks": {
+        "UserData": {
           "type": "special",
           "description": null
         },
-        "ssh_key": {
-          "type": "value",
-          "description": null
-        },
-        "user_data": {
+        "SubnetId": {
           "type": "special",
           "description": null
         },
-        "tags": {
+        "NetworkInterfaces": {
+          "type": "special",
+          "description": null
+        },
+        "Tags": {
           "type": [],
           "description": null
         }
       }
     },
-
-    "Generic::VM::SshKey": {
-      "type": "Generic::VM::SshKey",
-      "properties": {
-        "name": {
+    "AWS::EC2::VPC": {
+      "Type": "AWS::EC2::VPC",
+      "Properties": {
+        "CidrBlock": {
           "type": "value",
           "description": null
         },
-        "save_private_key": {
-          "type": "value",
-          "description": null
-        },
-        "public_key": {
-          "type": "value",
-          "description": null
-        },
-        "user": {
-          "type": "value",
-          "description": null
-        },
-        "tags": {
+        "Tags": {
           "type": [],
           "description": null
         }
       }
     },
-
-    "Generic::VM::SecurityGroup":{
-      "type": "Generic::VM::SecurityGroup",
-      "properties": {
-        "name": {
+    "AWS::EC2::Subnet": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "VpcId": {
           "type": "value",
           "description": null
         },
-        "description": {
+        "CidrBlock": {
           "type": "value",
           "description": null
         },
-        "ingress_rules": {
+        "AvailabilityZone": {
+          "type": "value",
+          "description": null
+        },
+        "Tags": {
+          "type": [],
+          "description": null
+        }
+      }
+    },
+    "AWS::EC2::SecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": {
+          "type": "value",
+          "description": null
+        },
+        "SecurityGroupIngress": {
           "type": "special",
           "description": null,
           "values": [
             {
-              "protocol": { //todo vytvorit tabulky prekladove tabulky pre special?
+              "IpProtocol": {
                 "type": "value",
                 "description": null
               },
-              "from_port": {
+              "FromPort": {
                 "type": "value",
                 "description": null
               },
-              "to_port": {
+              "ToPort": {
                 "type": "value",
                 "description": null
               },
-              "cidr": {
+              "CidrIp": {
                 "type": "value",
                 "description": null
               }
             }
           ]
         },
-        "egress_rules": {
+        "SecurityGroupEgress": {
           "type": "special",
           "description": null,
           "values": [
             {
-              "protocol": { //todo vytvorit tabulky prekladove tabulky pre special?
+              "IpProtocol": {
                 "type": "value",
                 "description": null
               },
-              "from_port": {
+              "FromPort": {
                 "type": "value",
                 "description": null
               },
-              "to_port": {
+              "ToPort": {
                 "type": "value",
                 "description": null
               },
-              "cidr": {
+              "CidrIp": {
                 "type": "value",
                 "description": null
               }
             }
           ]
         },
-        "tags": {
+        "Tags": {
           "type": [],
           "description": null
         }
       }
     },
-//todo ako sa spravaju rules? mozu byt samostatne alebo ako sucast security group
-//todo rule mozem vzdy v kode pridat do security group, musi mat aj direction, aj asociovanu security group
-    "Generic::VM::SecurityGroupRule": {
-      "type": "Generic::VM::SecurityGroupRule",
-      "properties": {
-        "name": {
+    "AWS::EC2::SecurityGroupEgress": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "CidrIp" : {
           "type": "value",
           "description": null
         },
-        "protocol": {
+        "CidrIpv6": {
           "type": "value",
           "description": null
         },
-        "from_port": {
+        "Description": {
           "type": "value",
           "description": null
         },
-        "to_port": {
+        "DestinationPrefixListId": {
           "type": "value",
           "description": null
         },
-        "cidr": {
+        "DestinationSecurityGroupId": {
           "type": "value",
           "description": null
         },
-        "security_group": {
+        "FromPort": {
           "type": "value",
           "description": null
         },
-        "direction": {
+        "GroupId": {
           "type": "value",
-          "description": null,
-          "allowed_values": ["ingress", "egress"]
+          "description": null
         },
-        "tags": {
-          "type": [],
+        "GroupName": {
+          "type": "value",
+          "description": null
+        },
+        "IpProtocol": {
+          "type": "value",
+          "description": null
+        },
+        "ToPort": {
+          "type": "value",
           "description": null
         }
       }
     },
-
-    "Generic::Network::Net": {
-      "type": "Generic::Network::Net",
-      "properties": {
-        "name": {
+    "AWS::EC2::SecurityGroupIngress": {
+      "Type" : "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "CidrIp" : {
           "type": "value",
           "description": null
         },
-        "cidr": {
+        "CidrIpv6": {
           "type": "value",
           "description": null
         },
-        "availability_zone": {
+        "Description": {
           "type": "value",
           "description": null
         },
-        "tags": {
-          "type": [],
-          "description": null
-        }
-      }
-    },
-
-    "Generic::Network::Subnet": {
-      "type": "Generic::Network::Subnet",
-      "properties": {
-        "cidr": {
+        "FromPort": {
           "type": "value",
           "description": null
         },
-        "network": {
+        "GroupId": {
           "type": "value",
           "description": null
         },
-        "name": {
+        "GroupName": {
           "type": "value",
           "description": null
         },
-        "dns": {
+        "IpProtocol": {
           "type": "value",
           "description": null
         },
-        "gateway": {
+        "SourceSecurityGroupName": {
           "type": "value",
           "description": null
         },
-        "ip_version": {
+        "SourceSecurityGroupId": {
           "type": "value",
           "description": null
         },
-        "availability_zone": {
+        "SourceSecurityGroupOwnerId": {
           "type": "value",
           "description": null
         },
-        "enable_dhcp": {
+        "ToPort": {
           "type": "value",
-          "description": null
-        },
-        "tags": {
-          "type": [],
           "description": null
         }
       }
     }
   }
 }
-//todo tag resource
-//prechadzanie required a optional, ak je niektore required
-//null, zahuci to, required a optional by malo byt
-//v templatoch Openstack, AWS
