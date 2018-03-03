@@ -27,7 +27,10 @@
       "-", 
       "AWS::EC2::Subnet"
     ]
-  }, 
+  },
+
+
+
   "resources": {
     "AWS::EC2::Instance": [
       [
