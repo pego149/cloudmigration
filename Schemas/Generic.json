@@ -6,6 +6,17 @@
     "resources": {}
   },
 
+  "schema_metadata": {
+    "template_version": "template_version",
+    "description": "description",
+    "parameters": "parameters",
+    "resources": "resources",
+    "resource": {
+      "type": "type",
+      "properties": "properties"
+    }
+  },
+
   "parameter": {
     "type": null,
     "name": null,
@@ -19,6 +30,7 @@
   "resources": {
     "Generic::VM::Server": {
       "type": "Generic::VM::Server",
+      "depends_on_properties": false,
       "properties": {
         "name": {
           "type": "value",
@@ -61,6 +73,7 @@
 
     "Generic::VM::SshKey": {
       "type": "Generic::VM::SshKey",
+      "depends_on_properties": false,
       "properties": {
         "name": {
           "type": "value",
@@ -87,6 +100,7 @@
 
     "Generic::VM::SecurityGroup":{
       "type": "Generic::VM::SecurityGroup",
+      "depends_on_properties": false,
       "properties": {
         "name": {
           "type": "value",
@@ -153,6 +167,7 @@
 
     "Generic::VM::SecurityGroupRule": {
       "type": "Generic::VM::SecurityGroupRule",
+      "depends_on_properties": false,
       "properties": {
         "name": {
           "type": "value",
@@ -192,6 +207,7 @@
 
     "Generic::Network::Net": {
       "type": "Generic::Network::Net",
+      "depends_on_properties": false,
       "properties": {
         "name": {
           "type": "value",
@@ -214,6 +230,7 @@
 
     "Generic::Network::Subnet": {
       "type": "Generic::Network::Subnet",
+      "depends_on_properties": false,
       "properties": {
         "cidr": {
           "type": "value",

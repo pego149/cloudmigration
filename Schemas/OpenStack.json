@@ -6,6 +6,17 @@
     "resources": {}
   },
 
+  "schema_metadata": {
+    "template_version": "heat_template_version",
+    "description": "description",
+    "parameters": "parameters",
+    "resources": "resources",
+    "resource": {
+      "type": "type",
+      "properties": "properties"
+    }
+  },
+
   "parameter": {
     "type": null,
     "description": null,
@@ -21,6 +32,7 @@
   "resources": {
     "OS::Nova::Server": {
       "type": "OS::Nova::Server",
+      "depends_on_properties": false,
       "required": [],
       "properties": {
         "image": {
@@ -59,6 +71,7 @@
     },
     "OS::Neutron::SecurityGroup": {
       "type": "OS::Neutron::SecurityGroup",
+      "depends_on_properties": false,
       "properties":{
         "name": {
           "type": "value",
@@ -112,6 +125,7 @@
     },
     "OS::Neutron::SecurityGroupRule": {
       "type": "OS::Neutron::SecurityGroupRule",
+      "depends_on_properties": false,
       "properties": {
         "description": {
           "type": "value",
@@ -153,6 +167,7 @@
     },
     "OS::Nova::KeyPair": {
       "type": "OS::Nova::KeyPair",
+      "depends_on_properties": false,
       "properties": {
         "name": {
           "type": "value",
@@ -174,6 +189,7 @@
     },
     "OS::Neutron::Net": {
       "type": "OS::Neutron::Net",
+      "depends_on_properties": false,
       "properties": {
         "admin_state_up": {
           "type": "value",
@@ -215,6 +231,7 @@
     },
     "OS::Neutron::Subnet": {
       "type": "OS::Neutron::Subnet",
+      "depends_on_properties": false,
       "properties": {
         "allocation_pools": {
           "type": "special",
