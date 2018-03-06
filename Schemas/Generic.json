@@ -11,6 +11,9 @@
     "description": "description",
     "parameters": "parameters",
     "resources": "resources",
+    "parameter": {
+      "constraints": "constraints"
+    },
     "resource": {
       "type": "type",
       "properties": "properties"
@@ -18,14 +21,46 @@
   },
 
   "parameter": {
-    "type": null,
-    "name": null,
-    "default": null,
-    "description": null,
-    "allowed_pattern": null,
-    "allowed_values": null,
-    "min_length": null,
-    "max_length": null
+    "type": {
+      "type": "value",
+      "description": null
+    },
+    "name": {
+      "type": "value",
+      "description": null
+    },
+    "default": {
+      "type": "value",
+      "description": null
+    },
+    "description": {
+      "type": "value",
+      "description": null
+    },
+    "allowed_pattern":{
+      "type": "value",
+      "description": null
+    },
+    "allowed_values": {
+      "type": [],
+      "description": null
+    },
+    "min_length": {
+      "type": "value",
+      "description": null
+    },
+    "max_length": {
+      "type": "value",
+      "description": null
+    },
+    "min_value": {
+      "type": "value",
+      "description": null
+    },
+    "max_value": {
+      "type": "value",
+      "description": null
+    }
   },
   "resources": {
     "Generic::VM::Server": {

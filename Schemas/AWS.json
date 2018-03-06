@@ -18,7 +18,42 @@
   },
 
   "parameter": {
-
+    "Type": {
+      "type": "value",
+      "description": null
+    },
+    "Description": {
+      "type": "value",
+      "description": null
+    },
+    "Default": {
+      "type": "value",
+      "description": null
+    },
+    "MinLength": {
+      "type": "value",
+      "description": null
+    },
+    "MaxLength": {
+      "type": "value",
+      "description": null
+    },
+    "MinValue": {
+      "type": "value",
+      "description": null
+    },
+    "MaxValue": {
+      "type": "value",
+      "description": null
+    },
+    "AllowedValues": {
+      "type": [],
+      "description": null
+    },
+    "AllowedPattern": {
+      "type": "value",
+      "description": null
+    }
   },
 
   "resources": {

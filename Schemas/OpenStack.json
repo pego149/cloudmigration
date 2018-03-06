@@ -10,6 +10,9 @@
     "template_version": "heat_template_version",
     "description": "description",
     "parameters": "parameters",
+    "parameter": {
+      "constraints": "constraints"
+    },
     "resources": "resources",
     "resource": {
       "type": "type",
@@ -18,15 +21,62 @@
   },
 
   "parameter": {
-    "type": null,
-    "description": null,
-    "default": null,
-    "length": {
-      "min": null,
-      "max": null
+    "type": {
+      "type": "value",
+      "description": null
     },
-    "allowed_pattern": null,
-    "allowed_values": null
+    "description": {
+      "type": "value",
+      "description": null
+    },
+    "default": {
+      "type": "value",
+      "description": null
+    },
+    "constraints": {
+      "type": "special",
+      "description": null
+    },
+    "length": {
+      "type": "special",
+      "description": null,
+      "in_constraints": true,
+      "values": {
+        "min": {
+          "type": "value",
+          "description": null
+        },
+        "max": {
+          "type": "value",
+          "description": null
+        }
+      }
+    },
+    "range": {
+      "type": "special",
+      "description": null,
+      "in_constraints": true,
+      "values": {
+        "min": {
+          "type": "value",
+          "description": null
+        },
+        "max": {
+          "type": "value",
+          "description": null
+        }
+      }
+    },
+    "allowed_pattern": {
+      "type": "value",
+      "in_constraints": true,
+      "description": null
+    },
+    "allowed_values": {
+      "type": [],
+      "in_constraints": true,
+      "description": null
+    }
   },
 
   "resources": {
