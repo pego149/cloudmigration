@@ -46,10 +46,10 @@ class Translation:
         if self.from_platform == self.to_platform:
             self.to_template = self.from_template
         if self.from_platform != "Generic":
-            from_module = self.loader.translation_modules[self.from_platform](self.loader.schemas(self.from_platform), self.loader.schemas("Generic"), loader.mapper)
+            from_module = self.loader.translation_modules[self.from_platform](self.from_platform, "Generic", self.loader.schemas(self.from_platform), self.loader.schemas("Generic"), loader.mapper)
             self.to_template = from_module.toGeneric(self.from_template)
         if self.to_platform != "Generic":
-            to_module = self.loader.translation_modules[self.to_platform](self.loader.schemas("Generic"), self.loader.schemas(self.to_platform), loader.mapper)
+            to_module = self.loader.translation_modules[self.to_platform]("Generic", self.to_platform, self.loader.schemas("Generic"), self.loader.schemas(self.to_platform), loader.mapper)
             self.to_template = to_module.fromGeneric(self.from_template)
         return self.to_template
 
