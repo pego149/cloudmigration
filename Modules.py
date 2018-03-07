@@ -1,6 +1,6 @@
 import json
 import os
-from cloudmigration.Mapper import Mapper
+from ..cloudmigration.Mapper import Mapper
 
 class Generic:
     def __init__(self, from_platform, to_platform, from_schema, to_schema, mapper: Mapper, from_schema_file_path=None, to_schema_file_path=None):
@@ -31,8 +31,8 @@ class Generic:
             with open(to_schema_file_path, 'r') as read_file:
                 self.to_schema = json.load(read_file)
 
-    def getSchemaMetadata(self, schema, key):
-        return schema["metadata"][key]
+    # def getSchemaMetadata(self, schema, key):
+    #     return schema["metadata"[key]
 
 
     # CAN TRANSLATE AS MANY PROPERTIES AS I LIKE
@@ -230,17 +230,32 @@ class OpenStack(Generic):
         to_parameter = super(self.__class__, self).translateParameter(from_parameter)
         if self.to_platform == "Generic":
             for constraint in from_parameter.get("constraints", []):
-                if "allowed_pattern" in constraint:
-                    to_parameter["allowed_pattern"] = constraint["allowed_pattern"]
-                elif "allowed_values" in constraint:
-                    to_parameter["allowed_values"] = constraint["allowed_values"]
-                elif "length" in constraint:
+                # if "allowed_pattern" in constraint:
+                #     to_parameter["allowed_pattern"] = constraint["allowed_pattern"]
+                # elif "allowed_values" in constraint:
+                #     to_parameter["allowed_values"] = constraint["allowed_values"]
+                if "length" in constraint:
                     to_parameter["min_length"] = constraint["length"].get("min", None)
                     to_parameter["max_length"] = constraint["length"].get("max", None)
                 elif "range" in constraint:
                     to_parameter["min_value"] = constraint["range"].get("min", None)
                     to_parameter["max_value"] = constraint["range"].get("max", None)
+                else:
+                    to_parameter.update(
+                        self.translateProperties(self.from_platform, constraint, self.from_schema["parameter"],
+                                                 self.to_platform, self.to_schema["parameter"],
+                                                 self.mapper.getParameterPropertyPair))
         elif self.from_platform == "Generic":
+            length = {}
+            range = {}
+            for to_property in list(to_parameter):
+                if self.to_schema["parameter"][to_property].get("in_constraints", False):
+                    if to_parameter.get(to_property, None) is not None:
+                        if (to_property == "min_length" and to_property.get("min_length", None) is not None) or (to_property == "max_length" and to_property.get("max_length", None) is not None):
+                            length()
+                            to_parameter.setdefault("constraints", []).append({to_property: to_parameter.pop(to_property)})
+                        if to_property == "min_length" or to_property == "max_length":
+                            to_parameter.setdefault("constraints", []).append({"length": {"min": to_parameter.pop(to_property, )}})
             pass
         return to_parameter
 
