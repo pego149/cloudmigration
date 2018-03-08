@@ -1,7 +1,7 @@
 from cloudmigration.Loader import Loader
 import json
 import yaml
-
+from copy import deepcopy
 class Template:
     def __init__(self, template=None):
         self.template = template
@@ -36,7 +36,7 @@ class Template:
 
 class Translation:
     def __init__(self, from_platform, from_template, to_platform, loader):
-        self.loader = loader if loader is not None else getattr(__import__("Loader", fromlist=["Loader"]), "Loader")
+        self.loader = deepcopy(loader if loader is not None else getattr(__import__("Loader", fromlist=["Loader"]), "Loader")) #copies
         self.from_platform = from_platform
         self.from_template = from_template
         self.to_platform = to_platform
@@ -47,10 +47,10 @@ class Translation:
             self.to_template = self.from_template
         if self.from_platform != "Generic":
             from_module = self.loader.translation_modules[self.from_platform](self.from_platform, "Generic", self.loader.schemas(self.from_platform), self.loader.schemas("Generic"), loader.mapper)
-            self.to_template = from_module.toGeneric(self.from_template)
+            self.to_template = from_module.translateTemplate(self.from_template)
         if self.to_platform != "Generic":
             to_module = self.loader.translation_modules[self.to_platform]("Generic", self.to_platform, self.loader.schemas("Generic"), self.loader.schemas(self.to_platform), loader.mapper)
-            self.to_template = to_module.fromGeneric(self.from_template)
+            self.to_template = to_module.translateTemplate(self.from_template)
         return self.to_template
 
     # def translate(self, paFromPlatform=None, paFromTemplate=None, paToPlatform=None, paLoader=None):
