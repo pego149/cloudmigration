@@ -50,7 +50,7 @@ class Generic:
                         if (from_property_type == "value" and to_property_type == "value") or (isinstance(from_property_type, list) and isinstance(to_property_type, list)):
                             to_properties[to_property] = from_properties[from_property]
                         elif from_property_type == "value" and isinstance(to_property_type, list):
-                            to_properties[to_property] = [from_properties[from_property]]
+                            to_properties.setdefault(to_property, []).append(from_properties[from_property])
                         elif isinstance(from_property_type, list) and to_property_type == "value":
                             to_properties[to_property] = from_properties[from_property][0] if from_properties[from_property] else None
         return to_properties
@@ -211,9 +211,46 @@ class AWS(Generic):
             to_resource_type = super(self.__class__, self).translateResourceType(from_resource_type)
         return to_resource_type
 
+    def translateResourceTags(self, from_resource):
+        to_tags = []
+        if self.to_platform == "Generic":
+            from_tags = from_resource[self.from_keys["resource"]["properties"]].get("Tags", [])
+            if from_tags is not None and from_tags:
+                for from_tag in from_tags:
+                    to_tags.append(
+                        {"key": from_tag["Key"], "value": from_tag["Value"]})
+        elif self.from_platform == "Generic":
+            from_tags = from_resource[self.from_keys["resource"]["properties"]].get("tags", [])
+            if from_tags is not None and from_tags:
+                for from_tag in from_tags:
+                    to_tags.append(
+                        {"Key": from_tag["key"], "Value": from_tag["value"]})
+        return to_tags
+
     def translateResource(self, from_resource):
         to_resource = super(self.__class__, self).translateResource(from_resource)
+        tags = self.translateResourceTags(from_resource)
+
+
+        # AWS instance
+        if self.to_platform == "Generic":
+            if to_resource[self.to_keys["resource"]["type"]] == "Generic::VM::Server":
+                ######## TODO check this!!!
+                to_resource[self.to_keys["resource"]["properties"]]["name"] = [tag["Value"] for tag in from_resource[self.from_schema["resource"]["properties"]]["Tags"] if "Name" in tag["Key"]][0]
+            if tags:
+                to_resource[self.to_keys["resource"]["properties"]]["tags"] = tags
+
+        elif self.from_platform == "Generic":
+            if to_resource[self.to_keys["resource"]["type"]] == "AWS::EC2::Instance":
+                to_resource[self.to_keys["resource"]["properties"]].setdefault("Tags", []).append({"Key": "Name", "Value": from_resource[self.from_keys["resource"]["properties"]]["name"]})
+            if tags:
+                to_resource[self.to_keys["resource"]["properties"]]["Tags"] = tags
+
+
         # todo special cases to and from generic
+
+
+
         return to_resource
 
 class OpenStack(Generic):
@@ -260,11 +297,35 @@ class OpenStack(Generic):
                 to_parameter.setdefault("constraints", []).append({"range": range})
         return to_parameter
 
+    def translateResourceTags(self, from_resource):
+        to_tags = []
+        if self.to_platform == "Generic":
+            from_tags = from_resource[self.from_keys["resource"]["properties"]].get("tags", [])
+            if from_tags:
+                for from_tag in from_tags:
+                    i = 1
+                    to_tags.append({"key": "Key{0}".format(i), "value": from_tag})
+                    i += 1
+        elif self.from_platform == "Generic":
+            from_tags = from_resource[self.from_keys["resource"]["properties"]].get("tags", [])
+            if from_tags:
+                for from_tag in from_tags:
+                    to_tags.append(from_tag["value"])
+        return to_tags
+
     def translateResource(self, from_resource):
         to_resource = super(self.__class__, self).translateResource(from_resource)
+        tags = self.translateResourceTags(from_resource)
         # todo special cases to and from generic
+        if self.to_platform == "Generic":
+            if tags:
+                to_resource[self.to_keys["resource"]["properties"]]["tags"] = tags
+        if self.to_platform == "Generic":
+            if tags:
+                to_resource[self.to_keys["resource"]["properties"]]["tags"] = tags
         return to_resource
 
-
-
-
+#todo userdata
+#todo network/subnet
+#todo securitygroup
+#in Openstack tags are only string values, in AWS {"Key": bla, "Value": bla}
