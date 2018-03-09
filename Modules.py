@@ -230,18 +230,26 @@ class AWS(Generic):
     def translateResource(self, from_resource):
         to_resource = super(self.__class__, self).translateResource(from_resource)
         tags = self.translateResourceTags(from_resource)
-
+        from_resource_type=self.from_keys["resource"]["type"]
 
         # AWS instance
         if self.to_platform == "Generic":
-            if to_resource[self.to_keys["resource"]["type"]] == "Generic::VM::Server":
+            if from_resource_type == "AWS::EC2::Instance":
                 ######## TODO check this!!!
                 to_resource[self.to_keys["resource"]["properties"]]["name"] = [tag["Value"] for tag in from_resource[self.from_schema["resource"]["properties"]]["Tags"] if "Name" in tag["Key"]][0]
+            elif from_resource_type == "AWS::EC2::SecurityGroupEgress":
+                to_resource[self.to_keys["resource"]["properties"]]["direction"] = "egress"
+            elif from_resource_type == "AWS::EC2::SecurityGroupIngress":
+                to_resource[self.to_keys["resource"]["properties"]]["direction"] = "inress"
+            "Generic::VM::SecurityGroupRule"
+
             if tags:
                 to_resource[self.to_keys["resource"]["properties"]]["tags"] = tags
 
+
+
         elif self.from_platform == "Generic":
-            if to_resource[self.to_keys["resource"]["type"]] == "AWS::EC2::Instance":
+            if from_resource_type == "Generic::VM::Server":
                 to_resource[self.to_keys["resource"]["properties"]].setdefault("Tags", []).append({"Key": "Name", "Value": from_resource[self.from_keys["resource"]["properties"]]["name"]})
             if tags:
                 to_resource[self.to_keys["resource"]["properties"]]["Tags"] = tags
@@ -320,11 +328,12 @@ class OpenStack(Generic):
         if self.to_platform == "Generic":
             if tags:
                 to_resource[self.to_keys["resource"]["properties"]]["tags"] = tags
-        if self.to_platform == "Generic":
+        elif self.to_platform == "Generic":
             if tags:
                 to_resource[self.to_keys["resource"]["properties"]]["tags"] = tags
         return to_resource
 
+#todo securitygrouprules
 #todo userdata
 #todo network/subnet
 #todo securitygroup
