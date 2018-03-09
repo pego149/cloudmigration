@@ -100,8 +100,14 @@
           "description": null
         },
         "tags": {
-          "type": [],
-          "description": null
+          "type": "special",
+          "description": null,
+          "values": [
+            {
+              "key": null,
+              "value": null
+            }
+          ]
         }
       }
     },
@@ -127,7 +133,7 @@
           "description": null
         },
         "tags": {
-          "type": [],
+          "type": "special",
           "description": null
         }
       }
@@ -194,7 +200,7 @@
           ]
         },
         "tags": {
-          "type": [],
+          "type": "special",
           "description": null
         }
       }
@@ -234,7 +240,7 @@
           "allowed_values": ["ingress", "egress"]
         },
         "tags": {
-          "type": [],
+          "type": "special",
           "description": null
         }
       }
@@ -257,7 +263,7 @@
           "description": null
         },
         "tags": {
-          "type": [],
+          "type": "special",
           "description": null
         }
       }
@@ -300,7 +306,7 @@
           "description": null
         },
         "tags": {
-          "type": [],
+          "type": "special",
           "description": null
         }
       }

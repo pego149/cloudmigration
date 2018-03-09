@@ -90,7 +90,7 @@
           "description": null
         },
         "Tags": {
-          "type": [],
+          "type": "special",
           "description": null
         }
       }
@@ -104,7 +104,7 @@
           "description": null
         },
         "Tags": {
-          "type": [],
+          "type": "special",
           "description": null
         }
       }
@@ -126,8 +126,14 @@
           "description": null
         },
         "Tags": {
-          "type": [],
-          "description": null
+          "type": "special",
+          "description": null,
+          "values": [
+            {
+              "Key": null,
+              "Value": null
+            }
+          ]
         }
       }
     },
@@ -188,7 +194,7 @@
           ]
         },
         "Tags": {
-          "type": [],
+          "type": "special",
           "description": null
         }
       }
