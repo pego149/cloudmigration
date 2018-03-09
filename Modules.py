@@ -240,9 +240,7 @@ class AWS(Generic):
             elif from_resource_type == "AWS::EC2::SecurityGroupEgress":
                 to_resource[self.to_keys["resource"]["properties"]]["direction"] = "egress"
             elif from_resource_type == "AWS::EC2::SecurityGroupIngress":
-                to_resource[self.to_keys["resource"]["properties"]]["direction"] = "inress"
-            "Generic::VM::SecurityGroupRule"
-
+                to_resource[self.to_keys["resource"]["properties"]]["direction"] = "ingress"
             if tags:
                 to_resource[self.to_keys["resource"]["properties"]]["tags"] = tags
 
