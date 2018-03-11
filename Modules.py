@@ -1,6 +1,6 @@
 import json
 import os
-from ..cloudmigration.Mapper import Mapper
+from cloudmigration.Mapper import Mapper
 
 class Generic:
     def __init__(self, from_platform, to_platform, from_schema, to_schema, mapper: Mapper, from_schema_file_path=None, to_schema_file_path=None):
@@ -12,6 +12,7 @@ class Generic:
         self.to_schema = to_schema
         self.from_keys = from_schema["schema_metadata"]
         self.to_keys = to_schema["schema_metadata"]
+        self.translateSpecial = {}
         if from_schema_file_path is not None:
             with open(from_schema_file_path, 'r') as read_file:
                 self.from_schema = json.load(read_file)
@@ -47,12 +48,18 @@ class Generic:
                     from_property_type = from_schema_properties[from_property]["type"]
                     to_property_type = to_schema_properties[to_property]["type"]
                     if to_property_type != 'special' and from_property_type != 'special':
-                        if (from_property_type == "value" and to_property_type == "value") or (isinstance(from_property_type, list) and isinstance(to_property_type, list)):
+                        if (from_property_type == "value" and to_property_type == "value") or (isinstance(from_property_type, list) and isinstance(to_property_type, list) and not from_property_type and not to_property_type):
                             to_properties[to_property] = from_properties[from_property]
                         elif from_property_type == "value" and isinstance(to_property_type, list):
                             to_properties.setdefault(to_property, []).append(from_properties[from_property])
                         elif isinstance(from_property_type, list) and to_property_type == "value":
                             to_properties[to_property] = from_properties[from_property][0] if from_properties[from_property] else None
+                        # internal properties - in case it pairs with list or value, one side must be nested type, "value" and nested type cannot exist
+                        # else:
+                        #     if isinstance(from_property_type, list):
+                        #         pass
+                    # elif from_schema_properties[from_property].get("special_type", None) is not None and to_schema_properties[from_property].get("special_type", None):
+
         return to_properties
 
     # def translateResourceProperties(self, from_resource, from_properties, from_schema_properties, to_resource, to_schema_properties):
@@ -162,11 +169,8 @@ class Generic:
         return to_resource_type
 
     def translateResource(self, from_resource):
-        # self.from_keys = self.from_schema["schema_metadata"]
-        # self.to_keys = self.to_schema["schema_metadata"]
         from_resource_type = from_resource[self.from_keys["resource"]["type"]]
         to_resource_type = self.translateResourceType(from_resource_type, from_resource)
-        # to_resource_type = self.mapper.getResourcePair(self.from_platform, from_resource_type, self.to_platform)
         if to_resource_type is not None:
             to_resource = { self.to_keys["type"]: to_resource_type }
             to_resource[self.to_keys["properties"]] = self.translateProperties(from_resource_type,
@@ -176,9 +180,9 @@ class Generic:
                                                                           self.to_schema[self.to_keys["resources"]][to_resource_type][self.to_keys["resource"]["properties"]],
                                                                           self.mapper.getResourcePair)
         else:
-            to_resource = "Not Implemented - {0}".format(from_resource_type)
+            to_resource = None
+            # to_resource = "Not Implemented - {0}".format(from_resource_type)
         return to_resource
-
 
     def translateTemplate(self, from_template):
         to_template = self.to_schema["template_structure"]
@@ -192,13 +196,20 @@ class Generic:
             from_resource = from_template[self.from_keys["resources"]]
             if isinstance(from_template[self.from_keys["resources"]], dict): #if resources are a dictionary
                 to_resource = self.translateResource(from_resource)
-                to_template[self.to_keys["resources"]][resource] = to_resource
+                to_template[self.to_keys["resources"]][resource] = to_resource if to_resource is not None else "Not Implemented - {0}".format(from_resource[self.from_keys["resource"]["type"]])
         return to_template
 
 
 class AWS(Generic):
     def __init__(self, from_platform, to_platform, from_schema, to_schema, mapper, from_schema_file_path=None, to_schema_file_path=None):
         Generic.__init__(self, from_platform, to_platform, from_schema, to_schema, mapper, from_schema_file_path, to_schema_file_path)
+        self.translateSpecial = {
+            "Generic::VM::SecurityGroupRule": self.translateSecurityGroupRule,
+            "Generic::VM::Server": self.translateInstance,
+            "AWS::EC2::Instance": self.translateInstance,
+            "Generic::VM::SecurityGroup": self.translateSecurityGroup,
+            "AWS::EC2::SecurityGroup": self.translateSecurityGroup
+        }
 
     def translateResourceType(self, from_resource_type, from_resource=None):
         to_resource_type = None
@@ -211,58 +222,78 @@ class AWS(Generic):
             to_resource_type = super(self.__class__, self).translateResourceType(from_resource_type)
         return to_resource_type
 
-    def translateResourceTags(self, from_resource):
-        to_tags = []
+    def translateInstance(self, from_resource, to_resource):
+        if from_resource[self.from_keys["resource"]["type"]] == "AWS::EC2::Instance":
+            ######## TODO check this!!!
+            names = [tag.get("Value", None) for tag in from_resource[self.from_schema["resource"]["properties"]].get("Tags", {}) if "Name" in tag.get("Key", None)]
+            to_resource[self.to_keys["resource"]["properties"]]["name"] = names[0] if names else None
+
+        elif from_resource[self.from_keys["resource"]["type"]] == "Generic::VM::Server":
+            if from_resource[self.from_keys["resource"]["properties"]]["name"] is not None:
+                to_resource[self.to_keys["resource"]["properties"]].setdefault("Tags", []).append(
+                    {"Key": "Name", "Value": from_resource[self.from_keys["resource"]["properties"]]["name"]})
+        return to_resource
+
+    def translateSecurityGroup(self, from_resource, to_resource):
+        from_resource_type = from_resource[self.from_keys["resource"]["type"]]
+        to_resource_type = to_resource[self.to_keys["resource"]["type"]]
+        if from_resource_type == "AWS::EC2::SecurityGroup":
+            for from_rules in ["SecurityGroupIngress", "SecurityGroupEgress"]:
+                from_rule_type = self.from_schema[self.from_keys["resource"]["properties"]][from_rules]["type"]
+                to_rules = self.mapper.getPropertyPair(from_resource_type, from_rules, to_resource_type)
+                to_rule_type = self.translateResourceType(from_rule_type)
+                for from_rule in from_rules:
+                    to_rule = self.translateProperties(from_rule_type, from_rule, self.from_schema[self.from_keys["resources"]][from_rule_type], to_rule_type, self.to_schema[self.to_keys["resources"]][to_rule_type], self.mapper.getPropertyPair)
+                    to_rule["direction"] = "ingress" if from_rules == "SecurityGroupIngress" else "egress"
+                    to_resource[self.to_keys["resource"]["properties"]].setdefault(to_rules, []).append(to_rule)
+
+        elif from_resource_type == "Generic::VM::SecurityGroup":
+            for from_rule in from_resource[self.from_keys["resource"]["properties"]["rules"]]:
+                if from_rule.get("direction", None) in ["ingress", "egress"]:
+                    from_rule_type = self.from_schema[self.from_keys["resource"]["properties"]]["rules"]["type"]
+                    to_rules = "SecurityGroupIngress" if from_rule.get("direction", None) == "ingress" else "SecurityGroupEgress"
+                    to_rule_type = to_resource[self.to_keys["resource"]["properties"]][to_rules]["type"]
+                    to_rule = self.translateProperties(from_rule_type, from_rule, self.from_schema[self.from_keys["resources"]][from_rule_type], to_rule_type, self.to_schema[self.to_keys["resources"]][to_rule_type], self.mapper.getPropertyPair)
+                    to_resource[self.to_keys["resource"]["properties"]].setdefault(to_rules, []).append(to_rule)
+        return to_resource
+
+    def translateSecurityGroupRule(self, from_resource, to_resource):
+        if from_resource[self.from_keys["resource"]["type"]] == "AWS::EC2::SecurityGroupEgress":
+            to_resource[self.to_keys["resource"]["properties"]]["direction"] = "egress"
+        elif from_resource[self.from_keys["resource"]["type"]] == "AWS::EC2::SecurityGroupIngress":
+            to_resource[self.to_keys["resource"]["properties"]]["direction"] = "ingress"
+        return to_resource
+
+    def translateResourceTags(self, from_resource, to_resource):
         if self.to_platform == "Generic":
-            from_tags = from_resource[self.from_keys["resource"]["properties"]].get("Tags", [])
-            if from_tags is not None and from_tags:
-                for from_tag in from_tags:
-                    to_tags.append(
-                        {"key": from_tag["Key"], "value": from_tag["Value"]})
+            if self.mapper.getPropertyPair(from_resource[self.from_keys["resource"]["type"]], "Tags", to_resource[self.to_keys["resource"]["type"]]) is not None:
+                from_tags = from_resource[self.from_keys["resource"]["properties"]].get("Tags", [])
+                if from_tags is not None and from_tags:
+                    for from_tag in from_tags:
+                        to_resource[self.to_keys["resource"]["properties"]].setdefault("tags", []).append({"key": from_tag["Key"], "value": from_tag["Value"]})
         elif self.from_platform == "Generic":
-            from_tags = from_resource[self.from_keys["resource"]["properties"]].get("tags", [])
-            if from_tags is not None and from_tags:
-                for from_tag in from_tags:
-                    to_tags.append(
-                        {"Key": from_tag["key"], "Value": from_tag["value"]})
-        return to_tags
+            if self.mapper.getPropertyPair(from_resource[self.from_keys["resource"]["type"]], "tags", to_resource[self.to_keys["resource"]["type"]]) is not None:
+                from_tags = from_resource[self.from_keys["resource"]["properties"]].get("tags", [])
+                if from_tags is not None and from_tags:
+                    for from_tag in from_tags:
+                        to_resource[self.to_keys["resource"]["properties"]].setdefault("Tags", []).append({"Key": from_tag["key"], "Value": from_tag["value"]})
+        return to_resource
 
     def translateResource(self, from_resource):
         to_resource = super(self.__class__, self).translateResource(from_resource)
-        tags = self.translateResourceTags(from_resource)
-        from_resource_type=self.from_keys["resource"]["type"]
-
-        # AWS instance
-        if self.to_platform == "Generic":
-            if from_resource_type == "AWS::EC2::Instance":
-                ######## TODO check this!!!
-                to_resource[self.to_keys["resource"]["properties"]]["name"] = [tag["Value"] for tag in from_resource[self.from_schema["resource"]["properties"]]["Tags"] if "Name" in tag["Key"]][0]
-            elif from_resource_type == "AWS::EC2::SecurityGroupEgress":
-                to_resource[self.to_keys["resource"]["properties"]]["direction"] = "egress"
-            elif from_resource_type == "AWS::EC2::SecurityGroupIngress":
-                to_resource[self.to_keys["resource"]["properties"]]["direction"] = "ingress"
-            if tags:
-                to_resource[self.to_keys["resource"]["properties"]]["tags"] = tags
-
-
-
-        elif self.from_platform == "Generic":
-            if from_resource_type == "Generic::VM::Server":
-                to_resource[self.to_keys["resource"]["properties"]].setdefault("Tags", []).append({"Key": "Name", "Value": from_resource[self.from_keys["resource"]["properties"]]["name"]})
-            if tags:
-                to_resource[self.to_keys["resource"]["properties"]]["Tags"] = tags
-
-
-        # todo special cases to and from generic
-
-
-
+        if to_resource is not None:
+            to_resource = self.translateResourceTags(from_resource, to_resource)
+            from_resource_type = from_resource[self.from_keys["resource"]["type"]]
+            to_resource = self.translateSpecial[from_resource_type](from_resource, to_resource) if self.translateSpecial.get(from_resource_type, None) is not None else to_resource
         return to_resource
 
 class OpenStack(Generic):
     def __init__(self, from_platform, to_platform, from_schema, to_schema, mapper, from_schema_file_path=None, to_schema_file_path=None):
         Generic.__init__(self, from_platform, to_platform, from_schema, to_schema, mapper, from_schema_file_path, to_schema_file_path)
-
+        self.translateSpecial = {
+            "Generic::VM::SecurityGroup": self.translateSecurityGroup,
+            "OS::Neutron::SecurityGroup": self.translateSecurityGroup
+        }
     def translateParameter(self, from_parameter):
         to_parameter = super(self.__class__, self).translateParameter(from_parameter)
         if self.to_platform == "Generic":
@@ -302,37 +333,50 @@ class OpenStack(Generic):
             if range:
                 to_parameter.setdefault("constraints", []).append({"range": range})
         return to_parameter
-
-    def translateResourceTags(self, from_resource):
-        to_tags = []
+    # todo prerobit aby kontrolovalo ci dany resource ma tagy!!! mapper.tranlateproperty is None...
+    def translateResourceTags(self, from_resource, to_resource):
         if self.to_platform == "Generic":
-            from_tags = from_resource[self.from_keys["resource"]["properties"]].get("tags", [])
-            if from_tags:
-                for from_tag in from_tags:
-                    i = 1
-                    to_tags.append({"key": "Key{0}".format(i), "value": from_tag})
-                    i += 1
+            if self.mapper.getPropertyPair(from_resource[self.from_keys["resource"]["type"]], "tags", to_resource[self.to_keys["resource"]["type"]]) is not None:
+                from_tags = from_resource[self.from_keys["resource"]["properties"]].get("tags", [])
+                if from_tags:
+                    for from_tag in from_tags:
+                        i = 1
+                        to_resource[self.to_keys["resource"]["properties"]].setdefault("tags", []).append({"key": "Key{0}".format(i), "value": from_tag})
+                        i += 1
         elif self.from_platform == "Generic":
-            from_tags = from_resource[self.from_keys["resource"]["properties"]].get("tags", [])
-            if from_tags:
-                for from_tag in from_tags:
-                    to_tags.append(from_tag["value"])
-        return to_tags
+            if self.mapper.getPropertyPair(from_resource[self.from_keys["resource"]["type"]], "tags", to_resource[self.to_keys["resource"]["type"]]) is not None:
+                from_tags = from_resource[self.from_keys["resource"]["properties"]].get("tags", [])
+                if from_tags:
+                    for from_tag in from_tags:
+                        to_resource[self.to_keys["resource"]["properties"]].setdefault("tags", []).append(from_tag["value"])
+        return to_resource
+
+    def translateInstance(self, from_resource, to_resource):
+        pass
+
+    def translateSecurityGroup(self, from_resource, to_resource):
+        from_resource_type = from_resource[self.from_keys["resource"]["type"]]
+        if from_resource_type == "Generic::VM::SecurityGroup" or from_resource_type == "OS::Neutron::SecurityGroup": #"rules" have the same name
+            from_rule_type = self.from_schema[self.from_keys["resource"]["properties"]]["rules"]["type"]
+            to_rule_type = self.translateResourceType(from_rule_type)
+            to_resource[self.to_keys["resource"]["properties"]]["rules"] = [self.translateProperties(from_rule_type, from_rule,
+                                     self.from_schema[self.from_keys["resources"]][from_rule_type], to_rule_type,
+                                     self.to_schema[self.to_keys["resources"]][to_rule_type],
+                                     self.mapper.getPropertyPair) for from_rule in from_resource[self.from_keys["resource"]["properties"]]["rules"]]
+
+        return to_resource
 
     def translateResource(self, from_resource):
         to_resource = super(self.__class__, self).translateResource(from_resource)
-        tags = self.translateResourceTags(from_resource)
-        # todo special cases to and from generic
-        if self.to_platform == "Generic":
-            if tags:
-                to_resource[self.to_keys["resource"]["properties"]]["tags"] = tags
-        elif self.to_platform == "Generic":
-            if tags:
-                to_resource[self.to_keys["resource"]["properties"]]["tags"] = tags
+        if to_resource is not None:
+            from_resource_type = from_resource[self.from_keys["resource"]["type"]]
+            to_resource = self.translateResourceTags(from_resource, to_resource)
+            to_resource = self.translateSpecial[from_resource_type](from_resource, to_resource) if self.translateSpecial.get(from_resource_type, None) is not None else to_resource
+
         return to_resource
 
-#todo securitygrouprules
+
 #todo userdata
 #todo network/subnet
-#todo securitygroup
+#todo references
 #in Openstack tags are only string values, in AWS {"Key": bla, "Value": bla}
