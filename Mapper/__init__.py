@@ -71,6 +71,3 @@ class Mapper:
             return self.mapping["resources"][paToResource][self.mapping["resources"][paFromResource].index(paFromProperty)]
         else:
             return None
-# # print bla.path
-# # print bla.mapping
-# # bla.updateMapping('mapping_2.json')

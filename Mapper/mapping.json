@@ -6,6 +6,8 @@
       "Generic::VM::SecurityGroup",
       "Generic::VM::SecurityGroupRule",
       "Generic::VM::SecurityGroupRule",
+      "Generic::VM::SecurityGroup::Rule",
+      "Generic::VM::SecurityGroup::Rule",
       "Generic::VM::SshKey",
       "Generic::Network::Subnet"
     ],
@@ -15,6 +17,8 @@
       "OS::Neutron::SecurityGroup",
       "OS::Neutron::SecurityGroupRule",
       "OS::Neutron::SecurityGroupRule",
+      "OS::Neutron::SecurityGroup::Rule",
+      "OS::Neutron::SecurityGroup::Rule",
       "OS::Nova::KeyPair",
       "OS::Neutron::Subnet"
     ],
@@ -24,6 +28,8 @@
       "AWS::EC2::SecurityGroup",
       "AWS::EC2::SecurityGroupIngress",
       "AWS::EC2::SecurityGroupEgress",
+      "AWS::EC2::SecurityGroup::SecurityGroupIngress",
+      "AWS::EC2::SecurityGroup::SecurityGroupEgress",
       null,
       "AWS::EC2::Subnet"
     ]
@@ -89,8 +95,8 @@
     "Generic::VM::SecurityGroup": [
       "name",
       "description",
-      "ingress_rules",
-      "egress_rules",
+      "rules",
+      "rules",
       "tags"
     ],
     "OS::Neutron::SecurityGroup": [
@@ -149,6 +155,34 @@
       "ToPort",
       "CidrIp",
       "GroupId",
+      null
+    ],
+    "Generic::VM::SecurityGroup::Rule": [
+      "protocol",
+      "from_port",
+      "to_port",
+      "cidr",
+      "direction"
+    ],
+    "OS::Neutron::SecurityGroup::Rule": [
+      "protocol",
+      "port_range_min",
+      "port_range_max",
+      "remote_ip_prefix",
+      "direction"
+    ],
+    "AWS::EC2::SecurityGroup::SecurityGroupIngress": [
+      "IpProtocol",
+      "FromPort",
+      "ToPort",
+      "CidrIp",
+      null
+    ],
+    "AWS::EC2::SecurityGroup::SecurityGroupEgress": [
+      "IpProtocol",
+      "FromPort",
+      "ToPort",
+      "CidrIp",
       null
     ],
     "Generic::VM::SshKey": [
