@@ -132,7 +132,7 @@
           "description": null
         },
         "rules": {
-          "type": "special",
+          "type": "OS::Neutron::SecurityGroup::Rule",
           "description": null,
           "values": [
             {
@@ -173,6 +173,42 @@
         }
       }
     },
+
+    "OS::Neutron::SecurityGroup::Rule": {
+      "remote_group_id": {
+        "type": "value",
+        "description": null
+      },
+      "direction": {
+        "type": "value",
+        "description": null
+      },
+      "remote_ip_prefix": {
+        "type": "value",
+        "description": null
+      },
+      "port_range_min": {
+        "type": "value",
+        "description": null
+      },
+      "remote_mode": {
+        "type": "value",
+        "description": null
+      },
+      "ethertype": {
+        "type": "value",
+        "description": null
+      },
+      "port_range_max": {
+        "type": "value",
+        "description": null
+      },
+      "protocol": {
+        "type": "value",
+        "description": null
+      }
+    },
+
     "OS::Neutron::SecurityGroupRule": {
       "type": "OS::Neutron::SecurityGroupRule",
       "depends_on_properties": false,

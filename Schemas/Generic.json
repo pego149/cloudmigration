@@ -151,35 +151,15 @@
           "type": "value",
           "description": null
         },
-        "ingress_rules": {
-          "type": "special",
+        "rules": {
+          "type": "Generic::VM::SecurityGroup::Rule",
           "description": null,
           "values": [
             {
-              "protocol": {
+              "direction": {
                 "type": "value",
                 "description": null
               },
-              "from_port": {
-                "type": "value",
-                "description": null
-              },
-              "to_port": {
-                "type": "value",
-                "description": null
-              },
-              "cidr": {
-                "type": "value",
-                "description": null
-              }
-            }
-          ]
-        },
-        "egress_rules": {
-          "type": "special",
-          "description": null,
-          "values": [
-            {
               "protocol": {
                 "type": "value",
                 "description": null
@@ -205,6 +185,30 @@
         }
       }
     },
+
+    "Generic::VM::SecurityGroup::Rule": {
+      "direction": {
+        "type": "value",
+        "description": null
+      },
+      "protocol": {
+        "type": "value",
+        "description": null
+      },
+      "from_port": {
+        "type": "value",
+        "description": null
+      },
+      "to_port": {
+        "type": "value",
+        "description": null
+      },
+      "cidr": {
+        "type": "value",
+        "description": null
+      }
+    },
+
 
     "Generic::VM::SecurityGroupRule": {
       "type": "Generic::VM::SecurityGroupRule",

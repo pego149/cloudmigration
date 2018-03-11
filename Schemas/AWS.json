@@ -146,7 +146,7 @@
           "description": null
         },
         "SecurityGroupIngress": {
-          "type": "special",
+          "type": "AWS::EC2::SecurityGroup::SecurityGroupIngress",
           "description": null,
           "values": [
             {
@@ -170,7 +170,7 @@
           ]
         },
         "SecurityGroupEgress": {
-          "type": "special",
+          "type": "AWS::EC2::SecurityGroup::SecurityGroupEgress",
           "description": null,
           "values": [
             {
@@ -199,6 +199,45 @@
         }
       }
     },
+
+    "AWS::EC2::SecurityGroup::SecurityGroupEgress": {
+      "IpProtocol": {
+        "type": "value",
+        "description": null
+      },
+      "FromPort": {
+        "type": "value",
+        "description": null
+      },
+      "ToPort": {
+        "type": "value",
+        "description": null
+      },
+      "CidrIp": {
+        "type": "value",
+        "description": null
+      }
+    },
+
+    "AWS::EC2::SecurityGroup::SecurityGroupIngress": {
+      "IpProtocol": {
+        "type": "value",
+        "description": null
+      },
+      "FromPort": {
+        "type": "value",
+        "description": null
+      },
+      "ToPort": {
+        "type": "value",
+        "description": null
+      },
+      "CidrIp": {
+        "type": "value",
+        "description": null
+      }
+    },
+
     "AWS::EC2::SecurityGroupEgress": {
       "Type": "AWS::EC2::SecurityGroupEgress",
       "depends_on_properties": true,
