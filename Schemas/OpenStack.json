@@ -330,7 +330,7 @@
           ]
         },
         "cidr": {
-          "type:": "value",
+          "type": "value",
           "description": null
         },
         "dns_nameservers": {
