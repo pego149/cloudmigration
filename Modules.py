@@ -1,6 +1,7 @@
 import json
 import os
 from cloudmigration.Mapper import Mapper
+import re
 
 class Generic:
     def __init__(self, from_platform, to_platform, from_schema, to_schema, mapper: Mapper, from_schema_file_path=None, to_schema_file_path=None):
@@ -19,6 +20,19 @@ class Generic:
         if to_schema_file_path is not None:
             with open(to_schema_file_path, 'r') as read_file:
                 self.to_schema = json.load(read_file)
+
+    def list_join(self, delimiter, from_list):
+        to_string = ""
+        for element in from_list[:-1]:
+            if isinstance(element, list):
+                to_string += "{0}{1}".format(self.list_join(delimiter, element), delimiter)
+            else:
+                to_string += "{0}{1}".format(str(element), delimiter)
+        to_string += self.list_join(delimiter, from_list[-1]) if isinstance(from_list[-1], list) else str(from_list[-1])
+        return to_string
+
+    def str_replace(self):
+        pass
 
     def loadFromSchema(self, from_schema=None, from_schema_file_path=None):
         if from_schema is not None:
@@ -227,11 +241,45 @@ class AWS(Generic):
             ######## TODO check this!!!
             names = [tag.get("Value", None) for tag in from_resource[self.from_schema["resource"]["properties"]].get("Tags", {}) if "Name" in tag.get("Key", None)]
             to_resource[self.to_keys["resource"]["properties"]]["name"] = names[0] if names else None
+        #UserData
+            from_property = "UserData"
+            from_user_data = from_resource[self.from_keys["resource"]["properties"]].get(from_property, None)
+            if from_user_data is not None:
+                if "Fn::Base64" in from_user_data:
+                    bare_data = self.list_join(from_user_data["Fn::Base64"]["Fn::Join"][0], from_user_data["Fn::Base64"]["Fn::Join"][1:]) if "Fn::Join" in from_user_data["Fn::Base64"] else from_user_data["Fn::Base64"]
+                    user_data_params = {}
+                    pattern = "\{'Ref'.+?\}"
+                    p = re.compile(pattern)
+                    found_references = p.findall(bare_data)
+                    if found_references:
+                        for from_reference in found_references:
+                            dict_reference = json.loads(from_reference)
+                            to_reference = "${0}".format(dict_reference["Ref"])
+                            user_data_params[to_reference] = dict_reference #Ref to ref will be handled by reference replacement method
+                            bare_data = bare_data.replace(from_reference, to_reference)
+                    to_property = self.mapper.getPropertyPair(from_resource[self.from_keys["resource"]["type"]], from_property, to_resource[self.to_keys["resource"]["type"]])
+                    to_resource[self.to_keys["resource"]["properties"]].setdefault(to_property, {})["bare_data"] = bare_data
+                    if user_data_params:
+                        to_resource[self.to_keys["resource"]["properties"]].setdefault(to_property, {})["params"] = user_data_params
 
         elif from_resource[self.from_keys["resource"]["type"]] == "Generic::VM::Server":
             if from_resource[self.from_keys["resource"]["properties"]]["name"] is not None:
                 to_resource[self.to_keys["resource"]["properties"]].setdefault("Tags", []).append(
                     {"Key": "Name", "Value": from_resource[self.from_keys["resource"]["properties"]]["name"]})
+            from_property = "user_data"
+            from_user_data = from_resource[self.from_keys["resource"]["properties"]].get(from_property, None)
+            if from_user_data is not None and "bare_data" in from_user_data:
+                to_user_data = from_user_data["bare_data"]
+                if "params" in from_user_data:
+                    from_params = from_user_data["params"]
+                    join_list = re.split('|'.join(list(from_params)), to_user_data)
+                    join_list = [{'Ref': from_params[element]['ref']} if element in from_params else element for element in join_list]
+                    to_user_data = {"Fn::Join": ["", join_list]}
+                to_property = self.mapper.getPropertyPair(from_resource[self.from_keys["resource"]["type"]],
+                                                          from_property,
+                                                          to_resource[self.to_keys["resource"]["type"]])
+                to_resource[self.to_keys["resource"]["properties"]].setdefault(to_property, {})["Fn::Base64"] = to_user_data
+
         return to_resource
 
     def translateSecurityGroup(self, from_resource, to_resource):
@@ -352,7 +400,34 @@ class OpenStack(Generic):
         return to_resource
 
     def translateInstance(self, from_resource, to_resource):
-        pass
+        if from_resource[self.from_keys["resource"]["type"]] == "OS::Nova::Server":
+            from_property = "user_data"
+            from_user_data = from_resource[self.from_keys["resource"]["properties"]].get(from_property, None)
+            if from_user_data is not None:
+                to_user_data = from_user_data["str_replace"]["template"] if "str_replace" in from_user_data else from_user_data
+                to_params = from_user_data["str_replace"]["params"] if "str_replace" in from_user_data else None
+                to_property = self.mapper.getPropertyPair(from_resource[self.from_keys["resource"]["type"]],
+                                                          from_property, to_resource[self.to_keys["resource"]["type"]])
+                to_resource[self.to_keys["resource"]["properties"]].setdefault(to_property, {})["bare_data"] = to_user_data
+                if to_params is not None:
+                    to_resource[self.to_keys["resource"]["properties"]].setdefault(to_property, {})["params"] = to_params
+
+        elif from_resource[self.from_keys["resource"]["type"]] == "Generic::VM::Server":
+            from_property = "user_data"
+            from_user_data = from_resource[self.from_keys["resource"]["properties"]].get(from_property, None)
+            if from_user_data is not None:
+                to_user_data = from_user_data.get("bare_data", None)
+                to_params = from_user_data.get("params", None)
+                if to_user_data is not None:
+                    to_property = self.mapper.getPropertyPair(from_resource[self.from_keys["resource"]["type"]],
+                                                              from_property,
+                                                              to_resource[self.to_keys["resource"]["type"]])
+                    to_resource[self.to_keys["resource"]["properties"]][to_property] = {}
+                    if to_params is not None:
+                        to_resource[self.to_keys["resource"]["properties"]][to_property]["str_replace"] = {"template": to_user_data, "params": to_params}
+                    else:
+                        to_resource[self.to_keys["resource"]["properties"]][to_property] = to_user_data
+        return to_resource
 
     def translateSecurityGroup(self, from_resource, to_resource):
         from_resource_type = from_resource[self.from_keys["resource"]["type"]]
@@ -380,3 +455,5 @@ class OpenStack(Generic):
 #todo network/subnet
 #todo references
 #in Openstack tags are only string values, in AWS {"Key": bla, "Value": bla}
+# https://docs.openstack.org/heat/pike/api/heat.engine.cfn.functions.html#heat.engine.cfn.functions.Ref
+
