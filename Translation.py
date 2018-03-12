@@ -7,7 +7,7 @@ class Template:
         self.template = template
 
     def dictFromFile(self, file_name, template_format):
-        with open(file_name, 'w') as read_file:
+        with open(file_name, 'r') as read_file:
             if template_format == "JSON":
                 self.template = json.load(read_file)
             elif template_format == "YAML":
@@ -68,11 +68,13 @@ class Translation:
 
 
 if __name__ == "__main__":
+    t = Template()
+    print(t.dictFromFile("bla.yaml", "YAML"))
     loader = Loader()
     template = {}
     translation = Translation("AWS", template, "AWS", loader)
     print(translation.loader.schemas)
-    print(translation.from_platform)
-    print(translation.to_platform)
-    print(translation.translate())
+    # print(translation.from_platform)
+    # print(translation.to_platform)
+    # print(translation.translate())
 
