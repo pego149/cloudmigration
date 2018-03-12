@@ -3,6 +3,8 @@ import os
 from cloudmigration.Mapper import Mapper
 import re
 
+
+
 class Generic:
     def __init__(self, from_platform, to_platform, from_schema, to_schema, mapper: Mapper, from_schema_file_path=None, to_schema_file_path=None):
         self.path = os.path.dirname(__file__)
@@ -13,6 +15,7 @@ class Generic:
         self.to_schema = to_schema
         self.from_keys = from_schema["schema_metadata"]
         self.to_keys = to_schema["schema_metadata"]
+        self.to_template = None
         self.translateSpecial = {}
         if from_schema_file_path is not None:
             with open(from_schema_file_path, 'r') as read_file:
@@ -21,15 +24,31 @@ class Generic:
             with open(to_schema_file_path, 'r') as read_file:
                 self.to_schema = json.load(read_file)
 
-    def list_join(self, delimiter, from_list):
+    def listJoin(self, delimiter, from_list):
         to_string = ""
         for element in from_list[:-1]:
             if isinstance(element, list):
-                to_string += "{0}{1}".format(self.list_join(delimiter, element), delimiter)
+                to_string += "{0}{1}".format(self.listJoin(delimiter, element), delimiter)
             else:
                 to_string += "{0}{1}".format(str(element), delimiter)
-        to_string += self.list_join(delimiter, from_list[-1]) if isinstance(from_list[-1], list) else str(from_list[-1])
+        to_string += self.listJoin(delimiter, from_list[-1]) if isinstance(from_list[-1], list) else str(from_list[-1])
         return to_string
+
+    def changeKeys(self, obj, convert):
+        """
+        Recursivly goes through the dictionnary obj and replaces keys with the convert function.
+        """
+        if isinstance(obj, dict):
+            new = {}
+            for k, v in obj.items():
+                new[convert(k, v)] = self.changeKeys(v, convert)
+        elif isinstance(obj, list):
+            new = []
+            for v in obj:
+                new.append(self.changeKeys(v, convert))
+        else:
+            return obj
+        return new
 
     def str_replace(self):
         pass
@@ -68,115 +87,12 @@ class Generic:
                             to_properties.setdefault(to_property, []).append(from_properties[from_property])
                         elif isinstance(from_property_type, list) and to_property_type == "value":
                             to_properties[to_property] = from_properties[from_property][0] if from_properties[from_property] else None
-                        # internal properties - in case it pairs with list or value, one side must be nested type, "value" and nested type cannot exist
-                        # else:
-                        #     if isinstance(from_property_type, list):
-                        #         pass
-                    # elif from_schema_properties[from_property].get("special_type", None) is not None and to_schema_properties[from_property].get("special_type", None):
-
         return to_properties
-
-    # def translateResourceProperties(self, from_resource, from_properties, from_schema_properties, to_resource, to_schema_properties):
-    #     to_properties = {}
-    #     for from_property in from_properties:
-    #         from_property_type = from_schema_properties[from_property]["type"]
-    #         if from_properties[from_property] is not None and from_property_type != 'special':
-    #             to_property = self.mapper.getPropertyPair(from_resource, from_property, to_resource)
-    #             if to_property is not None:
-    #                 to_property_type = to_schema_properties[to_property]["type"]
-    #                 if to_property_type != 'special':
-    #                     if (from_property_type == "value" and to_property_type == "value") or (isinstance(from_property_type, list) and isinstance(to_property_type, list)):
-    #                         to_properties[to_property] = from_properties[from_property]
-    #                     elif from_property_type == "value" and isinstance(to_property_type, list):
-    #                         to_properties[to_property].append(from_properties[from_property])
-    #                     elif isinstance(from_property_type, list) and to_property_type == "value":
-    #                         to_properties[to_property] = from_properties[from_property][0]
-    #     return to_properties
-    #
-    # def specialResourceFromGeneric(self, from_resource_type, from_resource_properties):
-    #     return from_resource_type
-    #
-    # def specialResourceToGeneric(self, from_resource_type, from_resource_properties):
-    #     return from_resource_type
-    # #
-    # def specialPropertiesFromGeneric(self, from_resource_type, from_resource, to_resource_type, to_resource):
-    #     return to_resource
-    #
-    # def specialPropertiesToGeneric(self, from_resource_type, from_resource, to_resource_type, to_resource):
-    #     return to_resource
-    # # todo include parameter_property_type translation (string, boolean...)
-    # # todo include parameters as list or dict
-    #
-    # def parameterFromGeneric(self, from_parameter):
-    #     return from_parameter
-    #
-    # def parameterToGeneric(self, from_parameter):
-    #     return from_parameter
-    # todo replace fromGeneric and toGeneric with translateTemplate(from_template), uses self.to_generic: Bool variable or self.from_platform, self.to_platform
-    # def fromGeneric(self, from_template):
-    #     self.from_keys = self.from_schema["schema_metadata"]
-    #     self.to_keys = self.to_schema["schema_metadata"]
-    #     to_template = self.to_schema["template_structure"]
-    #     to_template[self.to_keys["template_version"]] = from_template[self.from_keys["template_version"]]
-    #     to_template[self.to_keys["description"]] = from_template[self.from_keys["description"]]
-    #
-    #     for parameter in from_template[self.from_keys["parameters"]]:
-    #         to_template[self.to_keys["parameters"]][parameter] = self.parameterFromGeneric(from_template[self.from_keys["parameters"]][parameter])
-    #
-    #     for resource in from_template[self.from_keys["resources"]]:
-    #         # todo if resources is list, if resources is dict
-    #         from_resource = from_template[self.from_keys["resources"]][resource]
-    #         from_resource_type = from_resource[self.from_keys["resource"]["type"]]
-    #         to_resource_type = self.mapper.getResourcePair("Generic", from_resource_type, self.__class__.__name__)
-    #         if to_resource_type is not None:
-    #             # todo add in_properties to schemas --- if property is not in properties, push it higher
-    #             # todo replace resource handling in function
-    #             if self.to_schema[self.to_keys["resources"]][to_resource_type]["depends_on_properties"]:
-    #                 to_resource_type = self.specialResourceFromGeneric(from_resource_type, from_resource[self.from_keys["properties"]])
-    #             to_resource = {self.to_keys["type"]: to_resource_type}
-    #             to_resource[self.to_keys["properties"]] = self.translateResourceProperties(from_resource_type, from_resource[self.from_keys["properties"]], self.from_schema[self.from_keys["resources"]][from_resource_type][self.from_keys["properties"]], to_resource_type, self.to_schema[self.to_keys["resources"]][to_resource_type][self.to_keys["properties"]])
-    #             to_resource = self.specialPropertiesFromGeneric(from_resource_type, from_resource, to_resource_type, to_resource)
-    #             to_template[self.to_keys["resources"]][resource] = to_resource
-    #         else:
-    #             to_template[self.to_keys["resources"]][resource] = "Not Implemented - {0}".format(from_resource[self.from_keys["type"]])
-    #             pass
-    #
-    # def toGeneric(self, from_template):
-    #     self.from_keys = self.from_schema["schema_metadata"]
-    #     self.to_keys = self.to_schema["schema_metadata"]
-    #     to_template = self.to_schema["template_structure"]
-    #     to_template[self.to_keys["template_version"]] = from_template[self.from_keys["template_version"]]
-    #     to_template[self.to_keys["description"]] = from_template[self.from_keys["description"]]
-    #
-    #     for parameter in from_template[self.from_keys["parameters"]]:
-    #         to_template[self.to_keys["parameters"]][parameter] = self.parameterToGeneric(from_template[self.from_keys["parameters"]][parameter])
-    #
-    #     for resource in from_template[self.from_keys["resources"]]:
-    #         from_resource = from_template[self.from_keys["resources"]][resource]
-    #         from_resource_type = from_resource[self.from_keys["resource"]["type"]]
-    #         to_resource_type = self.mapper.getResourcePair(self.__class__.__name__, from_resource_type, "Generic")
-    #         if to_resource_type is not None:
-    #             if self.to_schema[self.to_keys["resources"]][to_resource_type]["depends_on_properties"]: #!!! Generic never depends on properties
-    #                 to_resource_type = self.specialResourceToGeneric(from_resource_type, from_resource[self.from_keys["properties"]])
-    #             to_resource = {self.to_keys["type"]: to_resource_type}
-    #             to_resource[self.to_keys["properties"]] = self.translateResourceProperties(from_resource_type, from_resource[self.from_keys["properties"]], self.from_schema[self.from_keys["resources"]][from_resource_type][self.from_keys["properties"]], to_resource_type, self.to_schema[self.to_keys["resources"]][to_resource_type][self.to_keys["properties"]])
-    #             to_resource = self.specialPropertiesToGeneric(from_resource_type, from_resource, to_resource_type, to_resource)
-    #             to_template[self.to_keys["resources"]][resource] = to_resource
-    #         else:
-    #             to_template[self.to_keys["resources"]][resource] = "Not Implemented - {0}".format(from_resource[self.from_keys["type"]])
-    #             pass
 
     def translateParameter(self, from_parameter):
         to_parameter = self.translateProperties(self.from_platform, from_parameter, self.from_schema["parameter"], self.to_platform, self.to_schema["parameter"], self.mapper.getParameterPropertyPair)
         #     todo translate parameter types function
         return to_parameter
-
-    # def translateResourceType(self, from_resource_type):
-    #     self.from_keys = self.from_schema["schema_metadata"]
-    #     self.to_keys = self.to_schema["schema_metadata"]
-    #     from_resource_type = from_resource[self.from_keys["resource"]["type"]]
-    #     to_resource_type = self.mapper.getResourcePair(self.from_platform, from_resource_type, self.to_platform)
-    #     return to_resource_type
 
     def translateResourceType(self, from_resource_type, from_resource=None):
         to_resource_type = self.mapper.getResourcePair(self.from_platform, from_resource_type, self.to_platform)
@@ -195,23 +111,26 @@ class Generic:
                                                                           self.mapper.getResourcePair)
         else:
             to_resource = None
-            # to_resource = "Not Implemented - {0}".format(from_resource_type)
         return to_resource
 
+    def translateReference(self, ref, value):
+        return ref
+
     def translateTemplate(self, from_template):
-        to_template = self.to_schema["template_structure"]
-        to_template[self.to_keys["template_version"]] = from_template[self.from_keys["template_version"]]
-        to_template[self.to_keys["description"]] = from_template[self.from_keys["description"]]
+        self.to_template = self.to_schema["template_structure"]
+        self.to_template[self.to_keys["template_version"]] = from_template[self.from_keys["template_version"]]
+        self.to_template[self.to_keys["description"]] = from_template[self.from_keys["description"]]
         # todo translateParameters method
         # In case of of different parameter configuration in template, create method translateParameters
         for parameter in from_template[self.from_keys["parameters"]]:
-            to_template[self.to_keys["parameters"]][parameter] = self.translateParameter(from_template[self.from_keys["parameters"]][parameter])
+            self.to_template[self.to_keys["parameters"]][parameter] = self.translateParameter(from_template[self.from_keys["parameters"]][parameter])
         for resource in from_template[self.from_keys["resources"]]:
             from_resource = from_template[self.from_keys["resources"]]
             if isinstance(from_template[self.from_keys["resources"]], dict): #if resources are a dictionary
                 to_resource = self.translateResource(from_resource)
-                to_template[self.to_keys["resources"]][resource] = to_resource if to_resource is not None else "Not Implemented - {0}".format(from_resource[self.from_keys["resource"]["type"]])
-        return to_template
+                self.to_template[self.to_keys["resources"]][resource] = to_resource if to_resource is not None else "Not Implemented - {0}".format(from_resource[self.from_keys["resource"]["type"]])
+        self.to_template = self.changeKeys(self.to_template, self.translateReference)
+        return self.to_template
 
 
 class AWS(Generic):
@@ -246,7 +165,7 @@ class AWS(Generic):
             from_user_data = from_resource[self.from_keys["resource"]["properties"]].get(from_property, None)
             if from_user_data is not None:
                 if "Fn::Base64" in from_user_data:
-                    bare_data = self.list_join(from_user_data["Fn::Base64"]["Fn::Join"][0], from_user_data["Fn::Base64"]["Fn::Join"][1:]) if "Fn::Join" in from_user_data["Fn::Base64"] else from_user_data["Fn::Base64"]
+                    bare_data = self.listJoin(from_user_data["Fn::Base64"]["Fn::Join"][0], from_user_data["Fn::Base64"]["Fn::Join"][1:]) if "Fn::Join" in from_user_data["Fn::Base64"] else from_user_data["Fn::Base64"]
                     user_data_params = {}
                     pattern = "\{'Ref'.+?\}"
                     p = re.compile(pattern)
@@ -334,6 +253,15 @@ class AWS(Generic):
             from_resource_type = from_resource[self.from_keys["resource"]["type"]]
             to_resource = self.translateSpecial[from_resource_type](from_resource, to_resource) if self.translateSpecial.get(from_resource_type, None) is not None else to_resource
         return to_resource
+
+    def translateReference(self, ref, value):
+        if self.from_platform == "Generic":
+            if ref == "ref":
+                ref = "Ref"
+        elif self.to_platform == "Generic":
+            if ref == "Ref":
+                ref = "ref"
+        return ref
 
 class OpenStack(Generic):
     def __init__(self, from_platform, to_platform, from_schema, to_schema, mapper, from_schema_file_path=None, to_schema_file_path=None):
@@ -450,6 +378,17 @@ class OpenStack(Generic):
 
         return to_resource
 
+    def translateReference(self, ref, value):
+        if self.from_platform == "Generic":
+            if ref == "ref":
+                if value in self.to_template[self.to_keys["parameters"]]:
+                    ref = "get_param"
+                else:
+                    ref = "get_resource"
+        elif self.to_platform == "Generic":
+            if ref in ["get_param", "get_resource"]:
+                ref = "ref"
+        return ref
 
 #todo userdata
 #todo network/subnet
