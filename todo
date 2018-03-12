@@ -1,8 +1,9 @@
 Implement in this order!!!
 1. Resolve networking in instance
-2. Try and except
-3. Create user interface (e.g. GUI, Website)
-4. Add Azure
-5. Expand
-6. Profit
-7. Repeat steps 5-7
+2. Translate parameter type (string -> String ...)
+3. Try and except
+4. Create user interface (e.g. GUI, Website)
+5. Add Azure
+6. Expand
+7. Profit
+8. Repeat steps 6-8
