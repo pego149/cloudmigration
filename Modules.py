@@ -11,8 +11,8 @@ class Generic:
         self.mapper = mapper
         self.from_platform = from_platform
         self.to_platform = to_platform
-        self.from_schema = from_schema
-        self.to_schema = to_schema
+        self.from_schema = dict(from_schema)
+        self.to_schema = dict(to_schema)
         self.from_keys = from_schema["schema_metadata"]
         self.to_keys = to_schema["schema_metadata"]
         self.to_template = None
@@ -102,13 +102,13 @@ class Generic:
         from_resource_type = from_resource[self.from_keys["resource"]["type"]]
         to_resource_type = self.translateResourceType(from_resource_type, from_resource)
         if to_resource_type is not None:
-            to_resource = { self.to_keys["type"]: to_resource_type }
-            to_resource[self.to_keys["properties"]] = self.translateProperties(from_resource_type,
-                                                                          from_resource[self.from_keys["properties"]],
+            to_resource = { self.to_keys["resource"]["type"]: to_resource_type }
+            to_resource[self.to_keys["resource"]["properties"]] = self.translateProperties(from_resource_type,
+                                                                          from_resource[self.from_keys["resource"]["properties"]],
                                                                           self.from_schema[self.from_keys["resources"]][from_resource_type][self.from_keys["resource"]["properties"]],
                                                                           to_resource_type,
                                                                           self.to_schema[self.to_keys["resources"]][to_resource_type][self.to_keys["resource"]["properties"]],
-                                                                          self.mapper.getResourcePair)
+                                                                          self.mapper.getPropertyPair)
         else:
             to_resource = None
         return to_resource
@@ -125,7 +125,7 @@ class Generic:
         for parameter in from_template[self.from_keys["parameters"]]:
             self.to_template[self.to_keys["parameters"]][parameter] = self.translateParameter(from_template[self.from_keys["parameters"]][parameter])
         for resource in from_template[self.from_keys["resources"]]:
-            from_resource = from_template[self.from_keys["resources"]]
+            from_resource = from_template[self.from_keys["resources"]][resource]
             if isinstance(from_template[self.from_keys["resources"]], dict): #if resources are a dictionary
                 to_resource = self.translateResource(from_resource)
                 self.to_template[self.to_keys["resources"]][resource] = to_resource if to_resource is not None else "Not Implemented - {0}".format(from_resource[self.from_keys["resource"]["type"]])
@@ -258,9 +258,13 @@ class AWS(Generic):
         if self.from_platform == "Generic":
             if ref == "ref":
                 ref = "Ref"
+            elif ref == "list_join":
+                ref = "Fn::Join"
         elif self.to_platform == "Generic":
             if ref == "Ref":
                 ref = "ref"
+            elif ref == "Fn::Join":
+                ref = "list_join"
         return ref
 
 class OpenStack(Generic):
@@ -390,9 +394,7 @@ class OpenStack(Generic):
                 ref = "ref"
         return ref
 
-#todo userdata
 #todo network/subnet
-#todo references
 #in Openstack tags are only string values, in AWS {"Key": bla, "Value": bla}
 # https://docs.openstack.org/heat/pike/api/heat.engine.cfn.functions.html#heat.engine.cfn.functions.Ref
 
