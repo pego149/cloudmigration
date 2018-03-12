@@ -2,6 +2,8 @@ from cloudmigration.Loader import Loader
 import json
 import yaml
 from copy import deepcopy
+
+
 class Template:
     def __init__(self, template=None):
         self.template = template
@@ -21,14 +23,16 @@ class Template:
             self.template = yaml.load(template)
         return self.template
 
-    def dictToFile(self, template, file_name, template_format):
+    def dictToFile(self, file_name, template_format, template=None):
+        template = template if template is not None else self.template
         with open(file_name, 'w') as write_file:
             if template_format == "JSON":
                 json.dump(template, write_file, indent=2)
             elif template_format == "YAML":
                 yaml.dump(template, write_file, indent=2)
 
-    def dictToString(self, template, template_format):
+    def dictToString(self, template_format, template=None):
+        template = template if template is not None else self.template
         if template_format == "JSON":
             return json.dumps(template, indent=2)
         elif template_format == "YAML":
@@ -46,11 +50,11 @@ class Translation:
         if self.from_platform == self.to_platform:
             self.to_template = self.from_template
         if self.from_platform != "Generic":
-            from_module = self.loader.translation_modules[self.from_platform](self.from_platform, "Generic", self.loader.schemas(self.from_platform), self.loader.schemas("Generic"), loader.mapper)
+            from_module = self.loader.translation_modules[self.from_platform](self.from_platform, "Generic", self.loader.schemas[self.from_platform], self.loader.schemas["Generic"], self.loader.mapper)
             self.to_template = from_module.translateTemplate(self.from_template)
         if self.to_platform != "Generic":
-            to_module = self.loader.translation_modules[self.to_platform]("Generic", self.to_platform, self.loader.schemas("Generic"), self.loader.schemas(self.to_platform), loader.mapper)
-            self.to_template = to_module.translateTemplate(self.from_template)
+            to_module = self.loader.translation_modules[self.to_platform]("Generic", self.to_platform, self.loader.schemas["Generic"], self.loader.schemas[self.to_platform], self.loader.mapper)
+            self.to_template = to_module.translateTemplate(self.to_template)
         return self.to_template
 
     # def translate(self, paFromPlatform=None, paFromTemplate=None, paToPlatform=None, paLoader=None):
