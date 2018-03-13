@@ -7,6 +7,16 @@ import re
 
 class Generic:
     def __init__(self, from_platform, to_platform, from_schema, to_schema, mapper: Mapper, from_schema_file_path=None, to_schema_file_path=None):
+        """
+        Constructor of class Generic. Sets attributes of the translation module
+        :param from_platform: Platform from which the template should be translated
+        :param to_platform: Platform to which the template should be translated
+        :param from_schema: Schema of the ingoing template
+        :param to_schema: Schema of the outgoing template
+        :param mapper: Instance of Mapper
+        :param from_schema_file_path: File from which the ingoing shcema should be loaded. Defaults to None.
+        :param to_schema_file_path: File from which the outgoing shcema should be loaded. Defaults to None.
+        """
         self.path = os.path.dirname(__file__)
         self.mapper = mapper
         self.from_platform = from_platform
@@ -25,6 +35,13 @@ class Generic:
                 self.to_schema = json.load(read_file)
 
     def listJoin(self, delimiter, from_list):
+        """
+        Method to simulate Fn::Join and list_join template functions.
+        Creates a string containing from_list elements separated by delimiter.
+        :param delimiter: The delimiter which separates the elements of the list
+        :param from_list: List to be joined
+        :return: String of joined list elements
+        """
         to_string = ""
         for element in from_list[:-1]:
             if isinstance(element, list):
@@ -36,7 +53,10 @@ class Generic:
 
     def changeKeys(self, obj, convert):
         """
-        Recursivly goes through the dictionnary obj and replaces keys with the convert function.
+        Recursivly goes through the dictionary obj and replaces keys with the convert function.
+        :param obj: Dict in which the keys should be replaced
+        :param convert: Function which handles the translation
+        :return: Object with translated keys
         """
         if isinstance(obj, dict):
             new = {}
@@ -54,6 +74,11 @@ class Generic:
         pass
 
     def loadFromSchema(self, from_schema=None, from_schema_file_path=None):
+        """
+        Method to load from_schema from a specified file or dict
+        :param from_schema: dict containing from_schema
+        :param from_schema_file_path: File path to file containing schema in json format
+        """
         if from_schema is not None:
             self.from_schema = from_schema
         elif from_schema_file_path is not None:
@@ -61,6 +86,11 @@ class Generic:
                 self.from_schema = json.load(read_file)
 
     def loadToSchema(self, to_schema=None, to_schema_file_path=None):
+        """
+        Method to load from_schema from a specified file or dict
+        :param to_schema: dict containing from_schema
+        :param to_schema_file_path: File path to file containing schema in json format
+        """
         if to_schema is not None:
             self.to_schema = to_schema
         elif to_schema_file_path is not None:
@@ -73,6 +103,17 @@ class Generic:
 
     # CAN TRANSLATE AS MANY PROPERTIES AS I LIKE
     def translateProperties(self, _from, from_properties, from_schema_properties, _to, to_schema_properties, getMappingPair):
+
+        """
+        Method to translate a dict of from_properties to a dict of to_properties. Properties of type different from "value" or [] will not be translated.
+        :param _from: Platform or resource type of the ingoing properties.
+        :param from_properties: Dict of template parameter or resource properties
+        :param from_schema_properties: Schema of the ingoing properties used for property type check.
+        :param _to: Platform or resource type of the ougoing properties.
+        :param to_schema_properties: Schema of the outgoing properties used for property type check.
+        :param getMappingPair: Function which finds property pairs. Usually supplied functions in the mapper module.
+        :return: Dict of translated properties
+        """
         to_properties = {}
         for from_property in from_properties:
             if from_properties[from_property] is not None: #NULL MAY BE IMPORTANT
@@ -90,15 +131,31 @@ class Generic:
         return to_properties
 
     def translateParameter(self, from_parameter):
+        """
+        Method to translate parameter properties.
+        :param from_parameter: Dict of parameter properties
+        :return: Dict of translated parameter properties
+        """
         to_parameter = self.translateProperties(self.from_platform, from_parameter, self.from_schema["parameter"], self.to_platform, self.to_schema["parameter"], self.mapper.getParameterPropertyPair)
         #     todo translate parameter types function
         return to_parameter
 
     def translateResourceType(self, from_resource_type, from_resource=None):
+        """
+        Method to translate resource type.
+        :param from_resource_type: Resource type of the ingoing resource
+        :param from_resource: The resource to be translated. Added in case outgoing resource type depends on resource properties. Defaults to None.
+        :return: Resource type of the outgoing resource.
+        """
         to_resource_type = self.mapper.getResourcePair(self.from_platform, from_resource_type, self.to_platform)
         return to_resource_type
 
     def translateResource(self, from_resource):
+        """
+        Method to translate the ingoing resource. Method first translates the type of the resource and then its properties.
+        :param from_resource: Resource to be translated
+        :return: Translated resource (dict)
+        """
         from_resource_type = from_resource[self.from_keys["resource"]["type"]]
         to_resource_type = self.translateResourceType(from_resource_type, from_resource)
         if to_resource_type is not None:
@@ -114,9 +171,20 @@ class Generic:
         return to_resource
 
     def translateReference(self, ref, value):
+        """
+        Method to translate references and special functions in a template.
+        :param ref: The key to be translated
+        :param value: The value assigne to the key.
+        :return: Returns translated reference.
+        """
         return ref
 
     def translateTemplate(self, from_template):
+        """
+        Method to translate the template.
+        :param from_template: Dict containing the template to be translated
+        :return: Dict containing the translated template
+        """
         self.to_template = self.to_schema["template_structure"]
         self.to_template[self.to_keys["template_version"]] = from_template[self.from_keys["template_version"]]
         self.to_template[self.to_keys["description"]] = from_template[self.from_keys["description"]]
@@ -135,6 +203,16 @@ class Generic:
 
 class AWS(Generic):
     def __init__(self, from_platform, to_platform, from_schema, to_schema, mapper, from_schema_file_path=None, to_schema_file_path=None):
+        """
+        Constructor of class AWS. Sets attributes of the translation module
+        :param from_platform: Platform from which the template should be translated
+        :param to_platform: Platform to which the template should be translated
+        :param from_schema: Schema of the ingoing template
+        :param to_schema: Schema of the outgoing template
+        :param mapper: Instance of Mapper
+        :param from_schema_file_path: File from which the ingoing shcema should be loaded. Defaults to None.
+        :param to_schema_file_path: File from which the outgoing shcema should be loaded. Defaults to None.
+        """
         Generic.__init__(self, from_platform, to_platform, from_schema, to_schema, mapper, from_schema_file_path, to_schema_file_path)
         self.translateSpecial = {
             "Generic::VM::SecurityGroupRule": self.translateSecurityGroupRule,
@@ -145,6 +223,13 @@ class AWS(Generic):
         }
 
     def translateResourceType(self, from_resource_type, from_resource=None):
+        """
+        Method to translate resource type. Overrides parent method.
+        :param from_resource_type: Resource type of the ingoing resource
+        :param from_resource: The resource to be translated.
+        Added in case outgoing resource type depends on resource properties. Defaults to None.
+        :return: Resource type of the outgoing resource.
+        """
         to_resource_type = None
         if from_resource_type == "Generic::VM::SecurityGroupRule":
             if from_resource[self.from_keys["properties"]]["direction"] == "ingress":
@@ -156,6 +241,12 @@ class AWS(Generic):
         return to_resource_type
 
     def translateInstance(self, from_resource, to_resource):
+        """
+        Method to translate special properties of an instance.
+        :param from_resource: Ingoing resource
+        :param to_resource: Outgoing resource which will be updated.
+        :return: Updated to_resource
+        """
         if from_resource[self.from_keys["resource"]["type"]] == "AWS::EC2::Instance":
             ######## TODO check this!!!
             names = [tag.get("Value", None) for tag in from_resource[self.from_schema["resource"]["properties"]].get("Tags", {}) if "Name" in tag.get("Key", None)]
@@ -202,6 +293,12 @@ class AWS(Generic):
         return to_resource
 
     def translateSecurityGroup(self, from_resource, to_resource):
+        """
+        Method to translate special properties of a security group.
+        :param from_resource: Ingoing resource
+        :param to_resource: Outgoing resource which will be updated.
+        :return: Updated to_resource
+        """
         from_resource_type = from_resource[self.from_keys["resource"]["type"]]
         to_resource_type = to_resource[self.to_keys["resource"]["type"]]
         if from_resource_type == "AWS::EC2::SecurityGroup":
@@ -225,6 +322,12 @@ class AWS(Generic):
         return to_resource
 
     def translateSecurityGroupRule(self, from_resource, to_resource):
+        """
+        Method to translate special properties of a security group rule.
+        :param from_resource: Ingoing resource
+        :param to_resource: Outgoing resource which will be updated.
+        :return: Updated to_resource
+        """
         if from_resource[self.from_keys["resource"]["type"]] == "AWS::EC2::SecurityGroupEgress":
             to_resource[self.to_keys["resource"]["properties"]]["direction"] = "egress"
         elif from_resource[self.from_keys["resource"]["type"]] == "AWS::EC2::SecurityGroupIngress":
@@ -232,6 +335,12 @@ class AWS(Generic):
         return to_resource
 
     def translateResourceTags(self, from_resource, to_resource):
+        """
+        Method to translate resource tags if the ingoing or outgoing resource contains them.
+        :param from_resource: Ingoing resource
+        :param to_resource: Outgoing resource which will be updated.
+        :return: Updated to_resource
+        """
         if self.to_platform == "Generic":
             if self.mapper.getPropertyPair(from_resource[self.from_keys["resource"]["type"]], "Tags", to_resource[self.to_keys["resource"]["type"]]) is not None:
                 from_tags = from_resource[self.from_keys["resource"]["properties"]].get("Tags", [])
@@ -247,6 +356,11 @@ class AWS(Generic):
         return to_resource
 
     def translateResource(self, from_resource):
+        """
+        Method to translate the ingoing resource. Uses and overrides perent method.
+        :param from_resource: Resource to be translated
+        :return: Translated resource (dict)
+        """
         to_resource = super(self.__class__, self).translateResource(from_resource)
         if to_resource is not None:
             to_resource = self.translateResourceTags(from_resource, to_resource)
@@ -255,6 +369,12 @@ class AWS(Generic):
         return to_resource
 
     def translateReference(self, ref, value):
+        """
+        Method to translate references and special functions in a template.
+        :param ref: The key to be translated
+        :param value: The value assigne to the key.
+        :return: Returns translated reference.
+        """
         if self.from_platform == "Generic":
             if ref == "ref":
                 ref = "Ref"
@@ -269,19 +389,30 @@ class AWS(Generic):
 
 class OpenStack(Generic):
     def __init__(self, from_platform, to_platform, from_schema, to_schema, mapper, from_schema_file_path=None, to_schema_file_path=None):
+        """
+        Constructor of class OpenStack. Sets attributes of the translation module
+        :param from_platform: Platform from which the template should be translated
+        :param to_platform: Platform to which the template should be translated
+        :param from_schema: Schema of the ingoing template
+        :param to_schema: Schema of the outgoing template
+        :param mapper: Instance of Mapper
+        :param from_schema_file_path: File from which the ingoing shcema should be loaded. Defaults to None.
+        :param to_schema_file_path: File from which the outgoing shcema should be loaded. Defaults to None.
+        """
         Generic.__init__(self, from_platform, to_platform, from_schema, to_schema, mapper, from_schema_file_path, to_schema_file_path)
         self.translateSpecial = {
             "Generic::VM::SecurityGroup": self.translateSecurityGroup,
             "OS::Neutron::SecurityGroup": self.translateSecurityGroup
         }
     def translateParameter(self, from_parameter):
+        """
+        Method to translate parameter properties. Uses and overrides parent method.
+        :param from_parameter: Dict of parameter properties
+        :return: Dict of translated parameter properties
+        """
         to_parameter = super(self.__class__, self).translateParameter(from_parameter)
         if self.to_platform == "Generic":
             for constraint in from_parameter.get("constraints", []):
-                # if "allowed_pattern" in constraint:
-                #     to_parameter["allowed_pattern"] = constraint["allowed_pattern"]
-                # elif "allowed_values" in constraint:
-                #     to_parameter["allowed_values"] = constraint["allowed_values"]
                 if "length" in constraint:
                     to_parameter["min_length"] = constraint["length"].get("min", None)
                     to_parameter["max_length"] = constraint["length"].get("max", None)
@@ -332,6 +463,12 @@ class OpenStack(Generic):
         return to_resource
 
     def translateInstance(self, from_resource, to_resource):
+        """
+        Method to translate special properties of an instance.
+        :param from_resource: Ingoing resource
+        :param to_resource: Outgoing resource which will be updated.
+        :return: Updated to_resource
+        """
         if from_resource[self.from_keys["resource"]["type"]] == "OS::Nova::Server":
             from_property = "user_data"
             from_user_data = from_resource[self.from_keys["resource"]["properties"]].get(from_property, None)
@@ -362,6 +499,12 @@ class OpenStack(Generic):
         return to_resource
 
     def translateSecurityGroup(self, from_resource, to_resource):
+        """
+        Method to translate special properties of a security group.
+        :param from_resource: Ingoing resource
+        :param to_resource: Outgoing resource which will be updated.
+        :return: Updated to_resource
+        """
         from_resource_type = from_resource[self.from_keys["resource"]["type"]]
         if from_resource_type == "Generic::VM::SecurityGroup" or from_resource_type == "OS::Neutron::SecurityGroup": #"rules" have the same name
             from_rule_type = self.from_schema[self.from_keys["resource"]["properties"]]["rules"]["type"]
@@ -374,6 +517,11 @@ class OpenStack(Generic):
         return to_resource
 
     def translateResource(self, from_resource):
+        """
+        Method to translate the ingoing resource. Uses and overrides perent method.
+        :param from_resource: Resource to be translated
+        :return: Translated resource (dict)
+        """
         to_resource = super(self.__class__, self).translateResource(from_resource)
         if to_resource is not None:
             from_resource_type = from_resource[self.from_keys["resource"]["type"]]
@@ -383,6 +531,12 @@ class OpenStack(Generic):
         return to_resource
 
     def translateReference(self, ref, value):
+        """
+        Method to translate references and special functions in a template.
+        :param ref: The key to be translated
+        :param value: The value assigne to the key.
+        :return: Returns translated reference.
+        """
         if self.from_platform == "Generic":
             if ref == "ref":
                 if value in self.to_template[self.to_keys["parameters"]]:

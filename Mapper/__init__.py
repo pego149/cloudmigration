@@ -22,10 +22,18 @@ class Mapper:
             self.updateMapping()
 
     def loadMapping(self, mapping_file):
+        """
+        Method to load mapping from a file.
+        :param mapping_file: Name of the file containing the mapping in JSON format
+        """
         with open(mapping_file, 'r') as read_file:
             self.mapping = json.load(read_file)
 
     def updateMapping(self, mapping_file='mapping.json'):
+        """
+        Method to create a JSON file containing the mapping of resources and properties.
+        :param mapping_file: Name of the file which will contain the updated mapping.
+        """
         mapping = {
             "platforms": defaultdict(list),
             "resources": defaultdict(list),
@@ -54,20 +62,41 @@ class Mapper:
             json.dump(mapping, write_file, indent=2)
         self.mapping = mapping
 
-    def getParameterPropertyPair(self, paFromPlatform, paFromParameterProperty, paToPlatform):
-        if paFromParameterProperty in self.mapping["parameters"][paFromPlatform]:
-            return self.mapping["parameters"][paToPlatform][self.mapping["parameters"][paFromPlatform].index(paFromParameterProperty)]
+    def getParameterPropertyPair(self, from_platform, from_parameter_property, to_platform):
+        """
+        Method to find the equivalent of a parameter property in the mapping
+        :param from_platform: Ingoing platform
+        :param from_parameter_property: Parameter property name
+        :param to_platform: Outgoing platform
+        :return: Equivalent of the parameter property if it exists, else None
+        """
+        if from_parameter_property in self.mapping["parameters"][from_platform]:
+            return self.mapping["parameters"][to_platform][self.mapping["parameters"][from_platform].index(from_parameter_property)]
         else:
             return None
 
-    def getResourcePair(self, paFromPlatform, paFromResource, paToPlatform):
-        if paFromResource in self.mapping["platforms"][paFromPlatform]:
-            return self.mapping["platforms"][paToPlatform][self.mapping["platforms"][paFromPlatform].index(paFromResource)]
+    def getResourcePair(self, from_platform, from_resource, to_platform):
+        """
+        Method to find the equivalent of a resource in the mapping
+        :param from_platform: Ingoing platform
+        :param ffrom_resource: Name of the resource
+        :param to_platform: Outgoing platform
+        :return: Equivalent of the resource if it exists, else None
+        """
+        if from_resource in self.mapping["platforms"][from_platform]:
+            return self.mapping["platforms"][to_platform][self.mapping["platforms"][from_platform].index(from_resource)]
         else:
             return None
 
-    def getPropertyPair(self, paFromResource, paFromProperty, paToResource):
-        if paFromProperty in self.mapping["resources"][paFromResource]:
-            return self.mapping["resources"][paToResource][self.mapping["resources"][paFromResource].index(paFromProperty)]
+    def getPropertyPair(self, from_resource, from_property, to_resource):
+        """
+        Method to find the equivalent of a parameter property in the mapping
+        :param from_resource: Ingoing resource
+        :param from_property: Resource property name
+        :param to_resource: Outgoing resource
+        :return: Equivalent of the resource property if it exists, else None
+        """
+        if from_property in self.mapping["resources"][from_resource]:
+            return self.mapping["resources"][to_resource][self.mapping["resources"][from_resource].index(from_property)]
         else:
             return None
