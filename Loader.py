@@ -9,7 +9,7 @@ class Loader:
         self.mapper = getattr(__import__("cloudmigration.Mapper", fromlist=["Mapper"]), "Mapper")()
         self.translation_modules = {}
         self.schemas = {}
-        with open('available_platforms.conf', 'r') as read_file:
+        with open('enabled_platforms.conf', 'r') as read_file:
             for platform in read_file.readlines():
                 # new_platform = __import__(platform.rstrip(), fromlist=[platform.rstrip()])
                 self.translation_modules[platform.rstrip()] = getattr(
