@@ -89,6 +89,10 @@
           "type": "value",
           "description": null
         },
+        "name": {
+          "type": "value",
+          "description": null
+        },
         "key_name": {
           "type": "value",
           "description": null
