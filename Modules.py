@@ -282,7 +282,9 @@ class AWS(Generic):
                 to_user_data = from_user_data["bare_data"]
                 if "params" in from_user_data:
                     from_params = from_user_data["params"]
-                    join_list = re.split('|'.join(list(from_params)), to_user_data)
+
+                    join_list = re.split("({0})".format(re.escape('|'.join(list(from_params)))), to_user_data)
+                    print(join_list)
                     join_list = [{'Ref': from_params[element]['ref']} if element in from_params else element for element in join_list]
                     to_user_data = {"Fn::Join": ["", join_list]}
                 to_property = self.mapper.getPropertyPair(from_resource[self.from_keys["resource"]["type"]],
@@ -402,7 +404,9 @@ class OpenStack(Generic):
         Generic.__init__(self, from_platform, to_platform, from_schema, to_schema, mapper, from_schema_file_path, to_schema_file_path)
         self.translateSpecial = {
             "Generic::VM::SecurityGroup": self.translateSecurityGroup,
-            "OS::Neutron::SecurityGroup": self.translateSecurityGroup
+            "OS::Neutron::SecurityGroup": self.translateSecurityGroup,
+            "OS::Nova::Server": self.translateInstance,
+            "Generic::VM::Server": self.translateInstance
         }
     def translateParameter(self, from_parameter):
         """
@@ -470,6 +474,7 @@ class OpenStack(Generic):
         :return: Updated to_resource
         """
         if from_resource[self.from_keys["resource"]["type"]] == "OS::Nova::Server":
+            print("bla")
             from_property = "user_data"
             from_user_data = from_resource[self.from_keys["resource"]["properties"]].get(from_property, None)
             if from_user_data is not None:
