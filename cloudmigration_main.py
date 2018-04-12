@@ -2,6 +2,7 @@ from cloudmigration.Loader import Loader
 from cloudmigration.Translation import Translation, Template
 
 loader = Loader()
+print(loader.enabled_platforms)
 from_template = Template() #create empty template class
 from_template.dictFromFile("orbis-lab.yaml", "YAML") #load template in yaml format to template
 translation = Translation("OpenStack", from_template.template, "AWS", loader) #creata instance of translation

@@ -85,14 +85,15 @@ class Translation:
         Method to translate the template with the use of translation modules.
         :return: Translated template
         """
-        if self.from_platform == self.to_platform:
-            self.to_template = self.from_template
-        if self.from_platform != "Generic":
-            from_module = self.loader.translation_modules[self.from_platform](self.from_platform, "Generic", self.loader.schemas[self.from_platform], self.loader.schemas["Generic"], self.loader.mapper)
-            self.to_template = from_module.translateTemplate(self.from_template)
-        if self.to_platform != "Generic":
-            to_module = self.loader.translation_modules[self.to_platform]("Generic", self.to_platform, self.loader.schemas["Generic"], self.loader.schemas[self.to_platform], self.loader.mapper)
-            self.to_template = to_module.translateTemplate(self.to_template)
+        if self.from_platform in self.loader.enabled_platforms and self.to_platform in self.loader.enabled_platforms:
+            if self.from_platform == self.to_platform:
+                self.to_template = self.from_template
+            if self.from_platform != "Generic":
+                from_module = self.loader.translation_modules[self.from_platform](self.from_platform, "Generic", self.loader.schemas[self.from_platform], self.loader.schemas["Generic"], self.loader.mapper)
+                self.to_template = from_module.translateTemplate(self.from_template)
+            if self.to_platform != "Generic":
+                to_module = self.loader.translation_modules[self.to_platform]("Generic", self.to_platform, self.loader.schemas["Generic"], self.loader.schemas[self.to_platform], self.loader.mapper)
+                self.to_template = to_module.translateTemplate(self.to_template)
         return self.to_template
 
     # def translate(self, paFromPlatform=None, paFromTemplate=None, paToPlatform=None, paLoader=None):
