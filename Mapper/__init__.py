@@ -35,9 +35,9 @@ class Mapper:
         :param mapping_file: Name of the file which will contain the updated mapping.
         """
         mapping = {
-            "platforms": defaultdict(list),
-            "resources": defaultdict(list),
-            "parameters": defaultdict(list)
+            "resource_types": defaultdict(list),
+            "resource_properties": defaultdict(list),
+            "parameter_properties": defaultdict(list)
         }
         for file_name in os.listdir(self.path):
             added_platforms = []
@@ -46,18 +46,18 @@ class Mapper:
                     for line in read_file.readlines():
                         split_line = line.split("\t")
                         if file_name == "Parameter.txt":
-                            mapping["parameters"][split_line[0]] = [parameter_property.rstrip() if parameter_property.rstrip() != "-" else None for parameter_property in split_line[1:]]
+                            mapping["parameter_properties"][split_line[0]] = [parameter_property.rstrip() if parameter_property.rstrip() != "-" else None for parameter_property in split_line[1:]]
                         else:
-                            mapping["platforms"][split_line[0]].append(split_line[1] if split_line[1] != "-" else None)
+                            mapping["resource_types"][split_line[0]].append(split_line[1] if split_line[1] != "-" else None)
                             if split_line[0] in added_platforms:
                                 with open(os.path.join(self.path, file_name), 'r') as read_file_2:
                                     for special_line in read_file_2.readlines():
                                         special_line = special_line.split("\t")
                                         if special_line[0] != split_line[0]:
-                                            mapping["platforms"][special_line[0]].append(special_line[1] if special_line[1] != "-" else None)
+                                            mapping["resource_types"][special_line[0]].append(special_line[1] if special_line[1] != "-" else None)
                             added_platforms.append(split_line[0])
                             if split_line[1] != '-':
-                                mapping["resources"][split_line[1]] = [resource_property.rstrip() if resource_property.rstrip() != "-" else None for resource_property in split_line[2:]]
+                                mapping["resource_properties"][split_line[1]] = [resource_property.rstrip() if resource_property.rstrip() != "-" else None for resource_property in split_line[2:]]
         with open(os.path.join(self.path, mapping_file), "w") as write_file:
             json.dump(mapping, write_file, indent=2)
         self.mapping = mapping
@@ -70,12 +70,12 @@ class Mapper:
         :param to_platform: Outgoing platform
         :return: Equivalent of the parameter property if it exists, else None
         """
-        if from_parameter_property in self.mapping["parameters"][from_platform]:
-            return self.mapping["parameters"][to_platform][self.mapping["parameters"][from_platform].index(from_parameter_property)]
+        if from_parameter_property in self.mapping["parameter_properties"][from_platform]:
+            return self.mapping["parameter_properties"][to_platform][self.mapping["parameter_properties"][from_platform].index(from_parameter_property)]
         else:
             return None
 
-    def getResourcePair(self, from_platform, from_resource, to_platform):
+    def getResourceTypePair(self, from_platform, from_resource, to_platform):
         """
         Method to find the equivalent of a resource in the mapping
         :param from_platform: Ingoing platform
@@ -83,12 +83,12 @@ class Mapper:
         :param to_platform: Outgoing platform
         :return: Equivalent of the resource if it exists, else None
         """
-        if from_resource in self.mapping["platforms"][from_platform]:
-            return self.mapping["platforms"][to_platform][self.mapping["platforms"][from_platform].index(from_resource)]
+        if from_resource in self.mapping["resource_types"][from_platform]:
+            return self.mapping["resource_types"][to_platform][self.mapping["resource_types"][from_platform].index(from_resource)]
         else:
             return None
 
-    def getPropertyPair(self, from_resource, from_property, to_resource):
+    def getResourcePropertyPair(self, from_resource, from_property, to_resource):
         """
         Method to find the equivalent of a parameter property in the mapping
         :param from_resource: Ingoing resource
@@ -96,7 +96,7 @@ class Mapper:
         :param to_resource: Outgoing resource
         :return: Equivalent of the resource property if it exists, else None
         """
-        if from_property in self.mapping["resources"][from_resource]:
-            return self.mapping["resources"][to_resource][self.mapping["resources"][from_resource].index(from_property)]
+        if from_property in self.mapping["resource_properties"][from_resource]:
+            return self.mapping["resource_properties"][to_resource][self.mapping["resource_properties"][from_resource].index(from_property)]
         else:
             return None

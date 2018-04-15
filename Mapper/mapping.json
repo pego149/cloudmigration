@@ -1,5 +1,5 @@
 {
-  "platforms": {
+  "resource_types": {
     "Generic": [
       "Generic::VM::Server",
       "Generic::Network::Net",
@@ -34,7 +34,7 @@
       "AWS::EC2::Subnet"
     ]
   },
-  "resources": {
+  "resource_properties": {
     "Generic::VM::Server": [
       "name",
       "image",
@@ -231,7 +231,7 @@
       "Tags"
     ]
   },
-  "parameters": {
+  "parameter_properties": {
     "Generic": [
       "type",
       "description",

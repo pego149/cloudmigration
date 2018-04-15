@@ -147,7 +147,7 @@ class Generic:
         :param from_resource: The resource to be translated. Added in case outgoing resource type depends on resource properties. Defaults to None.
         :return: Resource type of the outgoing resource.
         """
-        to_resource_type = self.mapper.getResourcePair(self.from_platform, from_resource_type, self.to_platform)
+        to_resource_type = self.mapper.getResourceTypePair(self.from_platform, from_resource_type, self.to_platform)
         return to_resource_type
 
     def translateResource(self, from_resource):
@@ -161,11 +161,11 @@ class Generic:
         if to_resource_type is not None:
             to_resource = { self.to_keys["resource"]["type"]: to_resource_type }
             to_resource[self.to_keys["resource"]["properties"]] = self.translateProperties(from_resource_type,
-                                                                          from_resource[self.from_keys["resource"]["properties"]],
-                                                                          self.from_schema[self.from_keys["resources"]][from_resource_type][self.from_keys["resource"]["properties"]],
-                                                                          to_resource_type,
-                                                                          self.to_schema[self.to_keys["resources"]][to_resource_type][self.to_keys["resource"]["properties"]],
-                                                                          self.mapper.getPropertyPair)
+                                                                                           from_resource[self.from_keys["resource"]["properties"]],
+                                                                                           self.from_schema[self.from_keys["resources"]][from_resource_type][self.from_keys["resource"]["properties"]],
+                                                                                           to_resource_type,
+                                                                                           self.to_schema[self.to_keys["resources"]][to_resource_type][self.to_keys["resource"]["properties"]],
+                                                                                           self.mapper.getResourcePropertyPair)
         else:
             to_resource = None
         return to_resource
@@ -267,7 +267,7 @@ class AWS(Generic):
                             to_reference = "${0}".format(dict_reference["Ref"])
                             user_data_params[to_reference] = dict_reference #Ref to ref will be handled by reference replacement method
                             bare_data = bare_data.replace(from_reference, to_reference)
-                    to_property = self.mapper.getPropertyPair(from_resource[self.from_keys["resource"]["type"]], from_property, to_resource[self.to_keys["resource"]["type"]])
+                    to_property = self.mapper.getResourcePropertyPair(from_resource[self.from_keys["resource"]["type"]], from_property, to_resource[self.to_keys["resource"]["type"]])
                     to_resource[self.to_keys["resource"]["properties"]].setdefault(to_property, {})["bare_data"] = bare_data
                     if user_data_params:
                         to_resource[self.to_keys["resource"]["properties"]].setdefault(to_property, {})["params"] = user_data_params
@@ -287,9 +287,9 @@ class AWS(Generic):
                     print(join_list)
                     join_list = [{'Ref': from_params[element]['ref']} if element in from_params else element for element in join_list]
                     to_user_data = {"Fn::Join": ["", join_list]}
-                to_property = self.mapper.getPropertyPair(from_resource[self.from_keys["resource"]["type"]],
-                                                          from_property,
-                                                          to_resource[self.to_keys["resource"]["type"]])
+                to_property = self.mapper.getResourcePropertyPair(from_resource[self.from_keys["resource"]["type"]],
+                                                                  from_property,
+                                                                  to_resource[self.to_keys["resource"]["type"]])
                 to_resource[self.to_keys["resource"]["properties"]].setdefault(to_property, {})["Fn::Base64"] = to_user_data
 
         return to_resource
@@ -306,10 +306,10 @@ class AWS(Generic):
         if from_resource_type == "AWS::EC2::SecurityGroup":
             for from_rules in ["SecurityGroupIngress", "SecurityGroupEgress"]:
                 from_rule_type = self.from_schema[self.from_keys["resource"]["properties"]][from_rules]["type"]
-                to_rules = self.mapper.getPropertyPair(from_resource_type, from_rules, to_resource_type)
+                to_rules = self.mapper.getResourcePropertyPair(from_resource_type, from_rules, to_resource_type)
                 to_rule_type = self.translateResourceType(from_rule_type)
                 for from_rule in from_rules:
-                    to_rule = self.translateProperties(from_rule_type, from_rule, self.from_schema[self.from_keys["resources"]][from_rule_type], to_rule_type, self.to_schema[self.to_keys["resources"]][to_rule_type], self.mapper.getPropertyPair)
+                    to_rule = self.translateProperties(from_rule_type, from_rule, self.from_schema[self.from_keys["resources"]][from_rule_type], to_rule_type, self.to_schema[self.to_keys["resources"]][to_rule_type], self.mapper.getResourcePropertyPair)
                     to_rule["direction"] = "ingress" if from_rules == "SecurityGroupIngress" else "egress"
                     to_resource[self.to_keys["resource"]["properties"]].setdefault(to_rules, []).append(to_rule)
 
@@ -319,7 +319,7 @@ class AWS(Generic):
                     from_rule_type = self.from_schema[self.from_keys["resource"]["properties"]]["rules"]["type"]
                     to_rules = "SecurityGroupIngress" if from_rule.get("direction", None) == "ingress" else "SecurityGroupEgress"
                     to_rule_type = to_resource[self.to_keys["resource"]["properties"]][to_rules]["type"]
-                    to_rule = self.translateProperties(from_rule_type, from_rule, self.from_schema[self.from_keys["resources"]][from_rule_type], to_rule_type, self.to_schema[self.to_keys["resources"]][to_rule_type], self.mapper.getPropertyPair)
+                    to_rule = self.translateProperties(from_rule_type, from_rule, self.from_schema[self.from_keys["resources"]][from_rule_type], to_rule_type, self.to_schema[self.to_keys["resources"]][to_rule_type], self.mapper.getResourcePropertyPair)
                     to_resource[self.to_keys["resource"]["properties"]].setdefault(to_rules, []).append(to_rule)
         return to_resource
 
@@ -344,13 +344,13 @@ class AWS(Generic):
         :return: Updated to_resource
         """
         if self.to_platform == "Generic":
-            if self.mapper.getPropertyPair(from_resource[self.from_keys["resource"]["type"]], "Tags", to_resource[self.to_keys["resource"]["type"]]) is not None:
+            if self.mapper.getResourcePropertyPair(from_resource[self.from_keys["resource"]["type"]], "Tags", to_resource[self.to_keys["resource"]["type"]]) is not None:
                 from_tags = from_resource[self.from_keys["resource"]["properties"]].get("Tags", [])
                 if from_tags is not None and from_tags:
                     for from_tag in from_tags:
                         to_resource[self.to_keys["resource"]["properties"]].setdefault("tags", []).append({"key": from_tag["Key"], "value": from_tag["Value"]})
         elif self.from_platform == "Generic":
-            if self.mapper.getPropertyPair(from_resource[self.from_keys["resource"]["type"]], "tags", to_resource[self.to_keys["resource"]["type"]]) is not None:
+            if self.mapper.getResourcePropertyPair(from_resource[self.from_keys["resource"]["type"]], "tags", to_resource[self.to_keys["resource"]["type"]]) is not None:
                 from_tags = from_resource[self.from_keys["resource"]["properties"]].get("tags", [])
                 if from_tags is not None and from_tags:
                     for from_tag in from_tags:
@@ -451,7 +451,7 @@ class OpenStack(Generic):
     # todo prerobit aby kontrolovalo ci dany resource ma tagy!!! mapper.tranlateproperty is None...
     def translateResourceTags(self, from_resource, to_resource):
         if self.to_platform == "Generic":
-            if self.mapper.getPropertyPair(from_resource[self.from_keys["resource"]["type"]], "tags", to_resource[self.to_keys["resource"]["type"]]) is not None:
+            if self.mapper.getResourcePropertyPair(from_resource[self.from_keys["resource"]["type"]], "tags", to_resource[self.to_keys["resource"]["type"]]) is not None:
                 from_tags = from_resource[self.from_keys["resource"]["properties"]].get("tags", [])
                 if from_tags:
                     for from_tag in from_tags:
@@ -459,7 +459,7 @@ class OpenStack(Generic):
                         to_resource[self.to_keys["resource"]["properties"]].setdefault("tags", []).append({"key": "Key{0}".format(i), "value": from_tag})
                         i += 1
         elif self.from_platform == "Generic":
-            if self.mapper.getPropertyPair(from_resource[self.from_keys["resource"]["type"]], "tags", to_resource[self.to_keys["resource"]["type"]]) is not None:
+            if self.mapper.getResourcePropertyPair(from_resource[self.from_keys["resource"]["type"]], "tags", to_resource[self.to_keys["resource"]["type"]]) is not None:
                 from_tags = from_resource[self.from_keys["resource"]["properties"]].get("tags", [])
                 if from_tags:
                     for from_tag in from_tags:
@@ -480,8 +480,8 @@ class OpenStack(Generic):
             if from_user_data is not None:
                 to_user_data = from_user_data["str_replace"]["template"] if "str_replace" in from_user_data else from_user_data
                 to_params = from_user_data["str_replace"]["params"] if "str_replace" in from_user_data else None
-                to_property = self.mapper.getPropertyPair(from_resource[self.from_keys["resource"]["type"]],
-                                                          from_property, to_resource[self.to_keys["resource"]["type"]])
+                to_property = self.mapper.getResourcePropertyPair(from_resource[self.from_keys["resource"]["type"]],
+                                                                  from_property, to_resource[self.to_keys["resource"]["type"]])
                 to_resource[self.to_keys["resource"]["properties"]].setdefault(to_property, {})["bare_data"] = to_user_data
                 if to_params is not None:
                     to_resource[self.to_keys["resource"]["properties"]].setdefault(to_property, {})["params"] = to_params
@@ -493,9 +493,9 @@ class OpenStack(Generic):
                 to_user_data = from_user_data.get("bare_data", None)
                 to_params = from_user_data.get("params", None)
                 if to_user_data is not None:
-                    to_property = self.mapper.getPropertyPair(from_resource[self.from_keys["resource"]["type"]],
-                                                              from_property,
-                                                              to_resource[self.to_keys["resource"]["type"]])
+                    to_property = self.mapper.getResourcePropertyPair(from_resource[self.from_keys["resource"]["type"]],
+                                                                      from_property,
+                                                                      to_resource[self.to_keys["resource"]["type"]])
                     to_resource[self.to_keys["resource"]["properties"]][to_property] = {}
                     if to_params is not None:
                         to_resource[self.to_keys["resource"]["properties"]][to_property]["str_replace"] = {"template": to_user_data, "params": to_params}
@@ -515,9 +515,9 @@ class OpenStack(Generic):
             from_rule_type = self.from_schema[self.from_keys["resource"]["properties"]]["rules"]["type"]
             to_rule_type = self.translateResourceType(from_rule_type)
             to_resource[self.to_keys["resource"]["properties"]]["rules"] = [self.translateProperties(from_rule_type, from_rule,
-                                     self.from_schema[self.from_keys["resources"]][from_rule_type], to_rule_type,
-                                     self.to_schema[self.to_keys["resources"]][to_rule_type],
-                                     self.mapper.getPropertyPair) for from_rule in from_resource[self.from_keys["resource"]["properties"]]["rules"]]
+                                                                                                     self.from_schema[self.from_keys["resources"]][from_rule_type], to_rule_type,
+                                                                                                     self.to_schema[self.to_keys["resources"]][to_rule_type],
+                                                                                                     self.mapper.getResourcePropertyPair) for from_rule in from_resource[self.from_keys["resource"]["properties"]]["rules"]]
 
         return to_resource
 
