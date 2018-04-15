@@ -94,7 +94,9 @@ class Translation:
             if self.to_platform != "Generic":
                 to_module = self.loader.translation_modules[self.to_platform]("Generic", self.to_platform, self.loader.schemas["Generic"], self.loader.schemas[self.to_platform], self.loader.mapper)
                 self.to_template = to_module.translateTemplate(self.to_template)
-        return self.to_template
+            return self.to_template
+        else:
+            return None
 
     # def translate(self, paFromPlatform=None, paFromTemplate=None, paToPlatform=None, paLoader=None):
     #     paFromPlatform = paFromPlatform if paFromPlatform is not None else self.from_platform
