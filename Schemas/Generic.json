@@ -12,7 +12,9 @@
     "parameters": "parameters",
     "resources": "resources",
     "parameter": {
-      "constraints": "constraints"
+      "type": "type",
+      "constraints": "constraints",
+      "default_type": "string"
     },
     "resource": {
       "type": "type",

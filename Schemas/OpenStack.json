@@ -1,6 +1,6 @@
 {
   "template_structure": {
-    "heat_template_version": null,
+    "heat_template_version": "pike",
     "description": null,
     "parameters": {},
     "resources": {}
@@ -11,7 +11,9 @@
     "description": "description",
     "parameters": "parameters",
     "parameter": {
-      "constraints": "constraints"
+      "type": "type",
+      "constraints": "constraints",
+      "default_type": "string"
     },
     "resources": "resources",
     "resource": {

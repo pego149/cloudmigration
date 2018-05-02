@@ -37,7 +37,8 @@ class Mapper:
         mapping = {
             "resource_types": defaultdict(list),
             "resource_properties": defaultdict(list),
-            "parameter_properties": defaultdict(list)
+            "parameter_properties": defaultdict(list),
+            "parameter_types": defaultdict(list)
         }
         for file_name in os.listdir(self.path):
             added_platforms = []
@@ -47,6 +48,8 @@ class Mapper:
                         split_line = line.split("\t")
                         if file_name == "Parameter.txt":
                             mapping["parameter_properties"][split_line[0]] = [parameter_property.rstrip() if parameter_property.rstrip() != "-" else None for parameter_property in split_line[1:]]
+                        elif file_name == "ParameterType.txt":
+                            mapping["parameter_types"][split_line[0]] = [parameter_type.rstrip() if parameter_type.rstrip() != "-" else None for parameter_type in split_line[1:]]
                         else:
                             mapping["resource_types"][split_line[0]].append(split_line[1] if split_line[1] != "-" else None)
                             if split_line[0] in added_platforms:
@@ -72,6 +75,18 @@ class Mapper:
         """
         if from_parameter_property in self.mapping["parameter_properties"][from_platform]:
             return self.mapping["parameter_properties"][to_platform][self.mapping["parameter_properties"][from_platform].index(from_parameter_property)]
+        else:
+            return None
+    def getParameterTypePair(self, from_platform, from_parameter_type, to_platform):
+        """
+        Method to find the equivalent of a parameter property in the mapping
+        :param from_platform: Ingoing platform
+        :param from_parameter_type: Parameter property name
+        :param to_platform: Outgoing platform
+        :return: Equivalent of the parameter property if it exists, else None
+        """
+        if from_parameter_type in self.mapping["parameter_types"][from_platform]:
+            return self.mapping["parameter_types"][to_platform][self.mapping["parameter_types"][from_platform].index(from_parameter_type)]
         else:
             return None
 

@@ -1,6 +1,6 @@
 {
   "template_structure": {
-    "AWSTemplateFormatVersion": null,
+    "AWSTemplateFormatVersion": "2010-09-09",
     "Description": null,
     "Parameters": {},
     "Resources": {}
@@ -9,6 +9,10 @@
   "schema_metadata": {
     "template_version": "AWSTemplateFormatVersion",
     "description": "Description",
+    "parameter": {
+      "type": "Type",
+      "default_type": "String"
+    },
     "parameters": "Parameters",
     "resources": "Resources",
     "resource": {

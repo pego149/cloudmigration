@@ -1,0 +1,3 @@
+Generic	string	number	list	boolean
+OpenStack	string	number	comma_delimited_list	boolean
+AWS	String	Number	List	-
