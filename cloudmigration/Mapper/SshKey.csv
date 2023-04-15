@@ -1,0 +1,4 @@
+Generic,Generic::VM::SshKey,properties,properties.name,properties.save_private_key,properties.public_key,properties.user
+OpenStack,OS::Nova::KeyPair,properties,properties.name,properties.save_private_key,properties.public_key,properties.user
+AWS,-,-,-,-,-,-
+Azure,-,-,-,-,-,-

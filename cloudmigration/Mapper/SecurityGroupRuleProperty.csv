@@ -1,0 +1,4 @@
+Generic,Generic::VM::SecurityGroup::Rule,properties,properties.protocol,properties.from_port,properties.to_port,properties.cidr,properties.direction
+OpenStack,OS::Neutron::SecurityGroup::Rule,properties,properties.protocol,properties.port_range_min,properties.port_range_max,properties.remote_ip_prefix,properties.direction
+AWS,AWS::EC2::SecurityGroup::SecurityGroupIngress,Properties,Properties.IpProtocol,Properties.FromPort,Properties.ToPort,Properties.CidrIp,-
+Azure,securityRules,properties,properties.protocol,properties.destinationPortRange,properties.destinationPortRange,properties.destinationAddressPrefix,properties.direction

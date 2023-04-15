@@ -1,0 +1,419 @@
+{
+  "template_structure": {
+    "heat_template_version": "pike",
+    "description": null,
+    "parameters": {},
+    "resources": {}
+  },
+
+  "schema_metadata": {
+    "template_version": "heat_template_version",
+    "description": "description",
+    "parameters": "parameters",
+    "parameter": {
+      "type": "type",
+      "constraints": "constraints",
+      "default_type": "string"
+    },
+    "resources": "resources",
+    "resource": {
+      "type": "type",
+      "properties": "properties",
+      "ref": ["get_param", "get_resource"]
+    }
+  },
+
+  "parameters": {
+    "label": {
+      "type": "value",
+      "description": null
+    },
+    "type": {
+      "type": "value",
+      "description": null
+    },
+    "description": {
+      "type": "value",
+      "description": null
+    },
+    "default": {
+      "type": "value",
+      "description": null
+    },
+    "constraints": {
+      "type": "dict",
+      "description": null
+    },
+    "length": {
+      "type": "dict",
+      "description": null,
+      "in_constraints": true,
+      "values": {
+        "min": {
+          "type": "value",
+          "description": null
+        },
+        "max": {
+          "type": "value",
+          "description": null
+        }
+      }
+    },
+    "range": {
+      "type": "dict",
+      "description": null,
+      "in_constraints": true,
+      "values": {
+        "min": {
+          "type": "value",
+          "description": null
+        },
+        "max": {
+          "type": "value",
+          "description": null
+        }
+      }
+    },
+    "allowed_pattern": {
+      "type": "value",
+      "in_constraints": true,
+      "description": null
+    },
+    "allowed_values": {
+      "type": [],
+      "in_constraints": true,
+      "description": null
+    }
+  },
+
+  "resources": {
+    "OS::Nova::Server": {
+      "type": "OS::Nova::Server",
+      "depends_on_properties": false,
+      "required": [],
+      "properties": {
+        "type": "dict",
+        "image": {
+          "type": "value",
+          "description": null
+        },
+        "name": {
+          "type": "value",
+          "description": null
+        },
+        "key_name": {
+          "type": "value",
+          "description": null
+        },
+        "flavor": {
+          "type": "value",
+          "description": null
+        },
+        "networks": {
+          "type": [],
+          "network" : {
+            "type": "value",
+            "description": null
+          }
+        },
+        "availability_zone": {
+          "type": "value",
+          "description": null
+        },
+        "security_groups": {
+          "type": [],
+          "description": null
+        },
+        "user_data": {
+          "type": "special",
+          "description": null
+        },
+        "tags": {
+          "type": [],
+          "description": null
+        }
+      }
+    },
+    "OS::Neutron::SecurityGroup": {
+      "type": "OS::Neutron::SecurityGroup",
+      "depends_on_properties": false,
+      "properties":{
+        "name": {
+          "type": "value",
+          "description": null
+        },
+        "description": {
+          "type": "value",
+          "description": null
+        },
+        "rules": {
+          "type": "OS::Neutron::SecurityGroup::Rule",
+          "description": null,
+          "values": [
+            {
+              "remote_group_id": {
+                "type": "value",
+                "description": null
+              },
+              "direction": {
+                "type": "value",
+                "description": null
+              },
+              "remote_ip_prefix": {
+                "type": "value",
+                "description": null
+              },
+              "port_range_min": {
+                "type": "value",
+                "description": null
+              },
+              "remote_mode": {
+                "type": "value",
+                "description": null
+              },
+              "ethertype": {
+                "type": "value",
+                "description": null
+              },
+              "port_range_max": {
+                "type": "value",
+                "description": null
+              },
+              "protocol": {
+                "type": "value",
+                "description": null
+              }
+            }
+          ]
+        }
+      }
+    },
+
+    "OS::Neutron::SecurityGroup::Rule": {
+      "remote_group_id": {
+        "type": "value",
+        "description": null
+      },
+      "direction": {
+        "type": "value",
+        "description": null
+      },
+      "remote_ip_prefix": {
+        "type": "value",
+        "description": null
+      },
+      "port_range_min": {
+        "type": "value",
+        "description": null
+      },
+      "remote_mode": {
+        "type": "value",
+        "description": null
+      },
+      "ethertype": {
+        "type": "value",
+        "description": null
+      },
+      "port_range_max": {
+        "type": "value",
+        "description": null
+      },
+      "protocol": {
+        "type": "value",
+        "description": null
+      }
+    },
+
+    "OS::Neutron::SecurityGroupRule": {
+      "type": "OS::Neutron::SecurityGroupRule",
+      "depends_on_properties": false,
+      "properties": {
+        "description": {
+          "type": "value",
+          "description": null
+        },
+        "direction": {
+          "type": "value",
+          "description": null
+        },
+        "ethertype": {
+          "type": "value",
+          "description": null
+        },
+        "port_range_max": {
+          "type": "value",
+          "description": null
+        },
+        "port_range_min": {
+          "type": "value",
+          "description": null
+        },
+        "protocol": {
+          "type": "value",
+          "description": null
+        },
+        "remote_group": {
+          "type": "value",
+          "description": null
+        },
+        "remote_ip_prefix": {
+          "type": "value",
+          "description": null
+        },
+        "security_group": {
+          "type": "value",
+          "description": null
+        }
+      }
+    },
+    "OS::Nova::KeyPair": {
+      "type": "OS::Nova::KeyPair",
+      "depends_on_properties": false,
+      "properties": {
+        "type": "dict",
+        "name": {
+          "type": "value",
+          "description": null
+        },
+        "save_private_key": {
+          "type": "value",
+          "description": null
+        },
+        "public_key": {
+          "type": "value",
+          "description": null
+        },
+        "user": {
+          "type": "value",
+          "description": null
+        }
+      }
+    },
+    "OS::Neutron::Net": {
+      "type": "OS::Neutron::Net",
+      "depends_on_properties": false,
+      "properties": {
+        "type": "dict",
+        "admin_state_up": {
+          "type": "value",
+          "description": null
+        },
+        "dhcp_agent_ids": {
+          "type": [],
+          "description": null
+        },
+        "dns_domain": {
+          "type": "value",
+          "description": null
+        },
+        "name": {
+          "type": "value",
+          "description": null
+        },
+        "port_security_enabled": {
+          "type": "value",
+          "description": null
+        },
+        "qos_policy": {
+          "type": "value",
+          "description": null
+        },
+        "shared": {
+          "type": "value",
+          "description": null
+        },
+        "tags": {
+          "type": [],
+          "description": null
+        },
+        "tenant_id": {
+          "type": "value",
+          "description": null
+        }
+      }
+    },
+    "OS::Neutron::Subnet": {
+      "type": "OS::Neutron::Subnet",
+      "depends_on_properties": false,
+      "properties": {
+        "type": "dict",
+        "allocation_pools": {
+          "type": "special",
+          "description": null,
+          "values": [
+            {
+              "start": "String",
+              "end": "String"
+            }
+          ]
+        },
+        "cidr": {
+          "type": "value",
+          "description": null
+        },
+        "dns_nameservers": {
+          "type": [],
+          "description": null
+        },
+        "enable_dhcp": {
+          "type": "value",
+          "description": null
+        },
+        "gateway_ip": {
+          "type": "value",
+          "description": null
+        },
+        "host_routes": {
+          "type": "special",
+          "description": null,
+          "values": [
+            {
+              "nexthop": "String",
+              "destination": "String"
+            }
+          ]
+        },
+        "ip_version": {
+          "type": "value",
+          "description": null
+        },
+        "ipv6_address_mode": {
+          "type": "value",
+          "description": null
+        },
+        "ipv6_ra_mode": {
+          "type": "value",
+          "description": null
+        },
+        "name": {
+          "type": "value",
+          "description": null
+        },
+        "network": {
+          "type": "value",
+          "description": null
+        },
+        "prefixlen": {
+          "type": "value",
+          "description": null
+        },
+        "segment": {
+          "type": "value",
+          "description": null
+        },
+        "subnetpool": {
+          "type": "value",
+          "description": null
+        },
+        "tags": {
+          "type": [],
+          "description": null
+        },
+        "tenant_id": {
+          "type": "value",
+          "description": null
+        }
+      }
+    }
+  }
+}

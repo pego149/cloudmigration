@@ -1,3 +1,0 @@
-Generic	Generic::Network::Net	name	cidr	subnets	availability_zone	tags
-OpenStack	OS::Neutron::Net	name	-	-	-	tags
-AWS	AWS::EC2::VPC	-	CidrBlock	-	AvailabilityZone	Tags

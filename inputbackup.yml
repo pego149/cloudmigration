@@ -1,0 +1,54 @@
+heat_template_version: 2018-08-31
+
+description: >
+  First instance in OpenStack created by Heat!
+
+parameters:
+  ServerName:
+    type: string
+    label: ServerName
+    description: Server name to be configured
+    default: 'FirstServer'
+  ServerFlavor:
+    type: string
+    label: ServerFlavor
+    description: Server flavor to be configured
+    default: 'm1.micro'
+  ServerImage:
+    type: string
+    label: ServerImage
+    description: Server image to be configured
+    default: 'cirros-0.5.2-x86_64-disk'
+
+parameter_groups:
+  - label: Server
+    description: All parameters related to server configuration
+    parameters:
+      - ServerName
+      - ServerFlavor
+      - ServerImage
+
+resources:
+  Net:
+    type: OS::Neutron::Net
+    properties:
+      name: 'private-network'
+      shared: false
+  Subnet:
+    type: OS::Neutron::Subnet
+    properties:
+      name: 'private-subnet'
+      network: { get_resource: Net }
+      cidr: 10.0.0.0/24
+      enable_dhcp: true
+
+  Server:
+    type: OS::Nova::Server
+    properties:
+      name: { get_param: ServerName }
+      flavor: { get_param: ServerFlavor }
+      image: { get_param: ServerImage }
+      networks:
+        - network: { get_resource: Net }
+      tags:
+        - { get_param: ServerName }

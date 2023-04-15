@@ -1,0 +1,30 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "project_name": {
+      "allowedValues": [
+        "'test'",
+        "'test2'",
+        "'test3'"
+      ],
+      "defaultValue": "test",
+      "maxLength": 2,
+      "metadata": {
+        "description": "Name of the project"
+      },
+      "minLength": 6,
+      "type": "string"
+    }
+  },
+  "resources": [
+    {
+      "dependsOn": "[parameters('Net')]",
+      "name": "private-subnet",
+      "properties": {
+        "addressPrefix": "10.0.0.0/24"
+      },
+      "type": "Microsoft.Network/virtualNetworks/subnets"
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "instance_name": {
+      "allowedValues": [
+        "server1",
+        "server2",
+        "server3"
+      ],
+      "defaultValue": "test",
+      "maxLength": 3,
+      "metadata": {
+        "description": "Name of the instance"
+      },
+      "minLength": 8,
+      "type": "string"
+    }
+  },
+  "resources": [
+    {
+      "properties": {
+        "addressPrefix": "10.0.0.0/24",
+        "dependsOn": "[parameters('Net')]",
+        "name": "Subnet"
+      },
+      "type": "Microsoft.Network/virtualNetworks/subnets"
+    }
+  ]
+}

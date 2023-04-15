@@ -1,0 +1,23 @@
+heat_template_version: 2018-08-31
+description: First instance in OpenStack created by Heat!
+
+parameters:
+  instance_name:
+    label: Instance name
+    description: Name of the instance
+    type: string
+    default: test
+    constraints:
+    - allowed_values: [ server1, server2, server3 ]
+    - length: { min: 3, max: 8 }
+    - allowed_pattern: "[A-Z]+[a-zA-Z0-9]*"
+
+resources:
+  Subnet:
+    type: OS::Neutron::Subnet
+    properties:
+      name: Subnet
+      network: { get_resource: Net }
+      cidr: 10.0.0.0/24
+      enable_dhcp: true
+

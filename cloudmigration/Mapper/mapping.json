@@ -1,0 +1,376 @@
+{
+  "resource_types": {
+    "Generic": [
+      "Generic::VM::Server",
+      "Generic::Network::Net",
+      "Generic::VM::SecurityGroup",
+      "Generic::VM::SecurityGroupRule",
+      "Generic::VM::SecurityGroup::Rule",
+      "Generic::VM::SshKey",
+      "Generic::Network::Subnet"
+    ],
+    "OpenStack": [
+      "OS::Nova::Server",
+      "OS::Neutron::Net",
+      "OS::Neutron::SecurityGroup",
+      "OS::Neutron::SecurityGroupRule",
+      "OS::Neutron::SecurityGroup::Rule",
+      "OS::Nova::KeyPair",
+      "OS::Neutron::Subnet"
+    ],
+    "AWS": [
+      "AWS::EC2::Instance",
+      "AWS::EC2::VPC",
+      "AWS::EC2::SecurityGroup",
+      "AWS::EC2::SecurityGroupIngress",
+      "AWS::EC2::SecurityGroup::SecurityGroupIngress",
+      null,
+      "AWS::EC2::Subnet"
+    ],
+    "Azure": [
+      "Microsoft.Compute/virtualMachines",
+      "Microsoft.Network/virtualNetworks",
+      "Microsoft.Network/networkSecurityGroups",
+      "Microsoft.Network/networkSecurityGroups/securityRules",
+      "securityRules",
+      null,
+      "Microsoft.Network/virtualNetworks/subnets"
+    ]
+  },
+  "resource_properties": {
+    "Generic::VM::Server": [
+      "properties",
+      "properties.name",
+      "properties.image",
+      "properties.instance_type",
+      "properties.security_groups",
+      "properties.availability_zone",
+      "properties.networks.network",
+      "properties.networks.network",
+      "properties.ssh_key",
+      "properties.user_data",
+      "properties.tags"
+    ],
+    "OS::Nova::Server": [
+      "properties",
+      "properties.name",
+      "properties.image",
+      "properties.flavor",
+      "properties.security_groups",
+      "properties.availability_zone",
+      "properties.networks.network",
+      "properties.networks.network",
+      "properties.key_name",
+      "properties.user_data",
+      "properties.tags"
+    ],
+    "AWS::EC2::Instance": [
+      "Properties",
+      null,
+      "Properties.ImageId",
+      "Properties.InstanceType",
+      "Properties.SecurityGroupIds",
+      "Properties.AvailabilityZone",
+      "Properties.SubnetId",
+      "Properties.NetworkInterfaces",
+      "Properties.KeyName",
+      "Properties.UserData",
+      "Properties.Tags"
+    ],
+    "Microsoft.Compute/virtualMachines": [
+      "properties",
+      "name",
+      "properties.storageProfile",
+      "properties.hardwareProfile.vmSize",
+      null,
+      "zones",
+      "properties.networkProfile.networkIterfaces.id",
+      "properties.networkProfile.networkIterfaces.id",
+      "properties.OSProfile.linuxConfiguration.ssh.publicKeys.path",
+      "properties.OSProfile.CustomData",
+      "tags"
+    ],
+    "Generic::Network::Net": [
+      "properties",
+      "properties.name",
+      "properties.cidr",
+      "properties.subnets",
+      "properties.availability_zone",
+      "properties.tags"
+    ],
+    "OS::Neutron::Net": [
+      "properties",
+      "properties.name",
+      null,
+      null,
+      null,
+      "properties.tags"
+    ],
+    "AWS::EC2::VPC": [
+      "Properties",
+      null,
+      "Properties.CidrBlock",
+      null,
+      "Properties.AvailabilityZone",
+      "Properties.Tags"
+    ],
+    "Microsoft.Network/virtualNetworks": [
+      "properties",
+      "name",
+      "properties.addressSpace.addressPrefixes",
+      null,
+      null,
+      "tags"
+    ],
+    "Generic::VM::SecurityGroup": [
+      "properties",
+      "properties.name",
+      "properties.description",
+      "properties.rules",
+      "properties.rules",
+      "properties.tags"
+    ],
+    "OS::Neutron::SecurityGroup": [
+      "properties",
+      "properties.name",
+      "properties.description",
+      "properties.rules",
+      "properties.rules",
+      null
+    ],
+    "AWS::EC2::SecurityGroup": [
+      "Properties",
+      "Properties.GroupName",
+      "Properties.GroupDescription",
+      "Properties.SecurityGroupIngress",
+      "Properties.SecurityGroupEgress",
+      "Properties.Tags"
+    ],
+    "Microsoft.Network/networkSecurityGroups": [
+      "properties",
+      "name",
+      "properties.description",
+      "properties.SecurityRules",
+      "properties.SecurityRules",
+      "properties.tags"
+    ],
+    "Generic::VM::SecurityGroupRule": [
+      "properties",
+      "properties.name",
+      "properties.description",
+      "properties.direction",
+      "properties.protocol",
+      "properties.from_port",
+      "properties.to_port",
+      "properties.cidr",
+      "properties.security_group",
+      "properties.tags"
+    ],
+    "OS::Neutron::SecurityGroupRule": [
+      "properties",
+      null,
+      "properties.description",
+      "properties.direction",
+      "properties.protocol",
+      "properties.port_range_min",
+      "properties.port_range_max",
+      "properties.remote_ip_prefix",
+      "properties.security_group",
+      null
+    ],
+    "AWS::EC2::SecurityGroupIngress": [
+      "Properties",
+      "properties.GroupName",
+      "Properties.Description",
+      null,
+      "Properties.IpProtocol",
+      "Properties.FromPort",
+      "Properties.ToPort",
+      "Properties.CidrIp",
+      "Properties.GroupId",
+      null
+    ],
+    "Microsoft.Network/networkSecurityGroups/securityRules": [
+      "properties",
+      "name",
+      "properties.description",
+      "properties.direction",
+      "properties.protocol",
+      "properties.destinationPortRange",
+      "properties.destinationPortRange",
+      "properties.destinationAddressPrefix",
+      null,
+      "properties.tags"
+    ],
+    "Generic::VM::SecurityGroup::Rule": [
+      "properties",
+      "properties.protocol",
+      "properties.from_port",
+      "properties.to_port",
+      "properties.cidr",
+      "properties.direction"
+    ],
+    "OS::Neutron::SecurityGroup::Rule": [
+      "properties",
+      "properties.protocol",
+      "properties.port_range_min",
+      "properties.port_range_max",
+      "properties.remote_ip_prefix",
+      "properties.direction"
+    ],
+    "AWS::EC2::SecurityGroup::SecurityGroupIngress": [
+      "Properties",
+      "Properties.IpProtocol",
+      "Properties.FromPort",
+      "Properties.ToPort",
+      "Properties.CidrIp",
+      null
+    ],
+    "securityRules": [
+      "properties",
+      "properties.protocol",
+      "properties.destinationPortRange",
+      "properties.destinationPortRange",
+      "properties.destinationAddressPrefix",
+      "properties.direction"
+    ],
+    "Generic::VM::SshKey": [
+      "properties",
+      "properties.name",
+      "properties.save_private_key",
+      "properties.public_key",
+      "properties.user"
+    ],
+    "OS::Nova::KeyPair": [
+      "properties",
+      "properties.name",
+      "properties.save_private_key",
+      "properties.public_key",
+      "properties.user"
+    ],
+    "Generic::Network::Subnet": [
+      "properties",
+      "properties.name",
+      "properties.network",
+      "properties.cidr",
+      "properties.dns",
+      "properties.gateway",
+      "properties.ip_version",
+      "properties.enable_dhcp",
+      "properties.availability_zone",
+      "properties.tags"
+    ],
+    "OS::Neutron::Subnet": [
+      "properties",
+      "properties.name",
+      "properties.network",
+      "properties.cidr",
+      "properties.dns_nameservers",
+      "properties.gateway_ip",
+      "properties.ip_version",
+      "properties.enable_dhcp",
+      null,
+      "properties.tags"
+    ],
+    "AWS::EC2::Subnet": [
+      "Properties",
+      null,
+      "Properties.VpcId",
+      "Properties.CidrBlock",
+      null,
+      null,
+      null,
+      null,
+      "Properties.AvailabilityZone",
+      "Properties.Tags"
+    ],
+    "Microsoft.Network/virtualNetworks/subnets": [
+      "properties",
+      "name",
+      "dependsOn",
+      "properties.addressPrefix",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ]
+  },
+  "parameter_properties": {
+    "Generic": [
+      "label",
+      "type",
+      "description",
+      "default",
+      "min_length",
+      "max_length",
+      "min_value",
+      "max_value",
+      "allowed_values",
+      "allowed_pattern"
+    ],
+    "AWS": [
+      null,
+      "Type",
+      "Description",
+      "Default",
+      "MinLength",
+      "MaxLength",
+      "MinValue",
+      "MaxValue",
+      "AllowedValues",
+      "AllowedPattern"
+    ],
+    "OpenStack": [
+      "label",
+      "type",
+      "description",
+      "default",
+      "length",
+      "length",
+      "range",
+      "range",
+      "allowed_values",
+      "allowed_pattern"
+    ],
+    "Azure": [
+      null,
+      "type",
+      "metadata.description",
+      "defaultValue",
+      "maxLength",
+      "minLength",
+      "minValue",
+      "maxValue",
+      "allowedValues",
+      null
+    ]
+  },
+  "parameter_types": {
+    "Generic": [
+      "string",
+      "number",
+      "list",
+      "boolean"
+    ],
+    "OpenStack": [
+      "string",
+      "number",
+      "comma_delimited_list",
+      "boolean"
+    ],
+    "AWS": [
+      "String",
+      "Number",
+      "List",
+      null
+    ],
+    "Azure": [
+      "string",
+      "int",
+      "array",
+      "bool"
+    ]
+  }
+}

@@ -1,0 +1,4 @@
+Generic,Generic::Network::Net,properties,properties.name,properties.cidr,properties.subnets,properties.availability_zone,properties.tags
+OpenStack,OS::Neutron::Net,properties,properties.name,-,-,-,properties.tags
+AWS,AWS::EC2::VPC,Properties,-,Properties.CidrBlock,-,Properties.AvailabilityZone,Properties.Tags
+Azure,Microsoft.Network/virtualNetworks,properties,name,properties.addressSpace.addressPrefixes,-,-,tags

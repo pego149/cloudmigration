@@ -1,3 +1,0 @@
-Generic	Generic::VM::SecurityGroup	name	description	rules	rules	tags
-OpenStack	OS::Neutron::SecurityGroup	name	description	rules	rules	-
-AWS	AWS::EC2::SecurityGroup	GroupName	GroupDescription	SecurityGroupIngress	SecurityGroupEgress	Tags

@@ -1,0 +1,4 @@
+Generic,Generic::Network::Subnet,properties,properties.name,properties.network,properties.cidr,properties.dns,properties.gateway,properties.ip_version,properties.enable_dhcp,properties.availability_zone,properties.tags
+OpenStack,OS::Neutron::Subnet,properties,properties.name,properties.network,properties.cidr,properties.dns_nameservers,properties.gateway_ip,properties.ip_version,properties.enable_dhcp,-,properties.tags
+AWS,AWS::EC2::Subnet,Properties,-,Properties.VpcId,Properties.CidrBlock,-,-,-,-,Properties.AvailabilityZone,Properties.Tags
+Azure,Microsoft.Network/virtualNetworks/subnets,properties,name,dependsOn,properties.addressPrefix,-,-,-,-,-,-

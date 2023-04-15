@@ -1,0 +1,4 @@
+Generic,Generic::VM::SecurityGroup,properties,properties.name,properties.description,properties.rules,properties.rules,properties.tags
+OpenStack,OS::Neutron::SecurityGroup,properties,properties.name,properties.description,properties.rules,properties.rules,-
+AWS,AWS::EC2::SecurityGroup,Properties,Properties.GroupName,Properties.GroupDescription,Properties.SecurityGroupIngress,Properties.SecurityGroupEgress,Properties.Tags
+Azure,Microsoft.Network/networkSecurityGroups,properties,name,properties.description,properties.SecurityRules,properties.SecurityRules,properties.tags

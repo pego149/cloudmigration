@@ -1,3 +1,0 @@
-Generic	Generic::Network::Subnet	name	network	cidr	dns	gateway	ip_version	enable_dhcp	availability_zone	tags
-OpenStack	OS::Neutron::Subnet	name	network	cidr	dns_nameservers	gateway_ip	ip_version	enable_dhcp	-	tags
-AWS	AWS::EC2::Subnet	-	VpcId	CidrBlock	-	-	-	-	AvailabilityZone	Tags

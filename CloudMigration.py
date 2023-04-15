@@ -1,4 +1,4 @@
-import MainWindow as MainWindow
+from cloudmigration import MainWindow as MainWindow
 import tkinter as tk
 import glob
 

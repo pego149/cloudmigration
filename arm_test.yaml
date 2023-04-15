@@ -1,0 +1,20 @@
+description: null
+heat_template_version: pike
+parameters:
+  instance_name:
+    constraints:
+    - allowed_values:
+      - server1
+      - server2
+      - server3
+    - length:
+        max: 8
+        min: 3
+    default: test
+    description: Name of the instance
+    type: string
+resources:
+  Resource0:
+    properties:
+      cidr: 10.0.0.0/24
+    type: OS::Neutron::Subnet

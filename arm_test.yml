@@ -1,0 +1,23 @@
+description: First instance in OpenStack created by Heat!
+heat_template_version: pike
+parameters:
+  project_name:
+    constraints:
+    - allowed_pattern: '[A-Z]+[a-zA-Z0-9]*'
+    - allowed_values:
+      - test
+      - test2
+      - test3
+    - length:
+        max: 6
+        min: 2
+    default: test
+    description: Name of the project
+    type: string
+resources:
+  Subnet:
+    properties:
+      name:
+        get_param: Net
+      network: 10.0.0.0/24
+    type: OS::Neutron::Subnet

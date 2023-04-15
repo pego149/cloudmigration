@@ -1,0 +1,357 @@
+{
+  "template_structure": {
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {},
+    "resources": []
+  },
+  "schema_metadata": {
+    "template_version": "$schema",
+    "contentVersion": "contentVersion",
+    "parameter": {
+      "type": "type",
+      "default_type": "string",
+      "metadata": {
+        "description": "description"
+      }
+    },
+    "parameters": "parameters",
+    "resources": "resources",
+    "resource": {
+      "type": "type",
+      "properties": "properties",
+      "ref": ["parameters"]
+    }
+  },
+  "parameters": {
+    "type": {
+      "type": "value",
+      "description": null
+    },
+    "defaultValue": {
+      "type": "value",
+      "description": null
+    },
+    "minLength": {
+      "type": "value",
+      "description": null
+    },
+    "maxLength": {
+      "type": "value",
+      "description": null
+    },
+    "minValue": {
+      "type": "value",
+      "description": null
+    },
+    "maxValue": {
+      "type": "value",
+      "description": null
+    },
+    "allowedValues": {
+      "type": [],
+      "description": null
+    },
+    "metadata": {
+      "type": "dict",
+      "description": {
+        "type": "value",
+        "description": null
+      }
+    }
+  },
+  "resources": {
+    "Microsoft.Compute/virtualMachines": {
+      "type": "Microsoft.Compute/virtualMachines",
+      "depends_on_properties": false,
+      "name": {
+        "type": "value",
+        "description": null
+      },
+      "tags": {
+        "type": "special"
+      },
+      "properties": {
+        "type": "dict",
+        "storageProfile": {
+          "type": "value",
+          "description": null
+        },
+        "hardwareProfile": {
+          "type": "dict",
+          "vmSize": {
+            "type": "value",
+            "description": null
+          }
+        },
+        "networkProfile": {
+          "type": "dict",
+          "networkIterfaces": {
+            "type": [],
+            "id": {
+              "type": "value",
+              "description": null
+            }
+          }
+        },
+        "OSProfile": {
+          "type": "dict",
+          "linuxConfiguration": {
+            "type": "dict",
+            "ssh": {
+              "type": "dict",
+              "publicKeys": {
+                "type": "dict",
+                "path": {
+                  "type": "value",
+                  "description": null
+                }
+              }
+            }
+          },
+          "CustomData": {
+            "type": "value",
+            "description": null
+          }
+        }
+      },
+      "zones": {
+        "type": []
+      }
+    },
+    "Microsoft.Network/virtualNetworks": {
+      "type": "Microsoft.Network/virtualNetworks",
+      "depends_on_properties": false,
+      "name": {
+        "type": "value",
+        "description": null
+      },
+      "tags": {
+        "type": "special"
+      },
+      "properties": {
+        "type": "dict",
+        "addressSpace": {
+          "type": "dict",
+          "addressPrefixes": {
+            "type": [],
+            "description": null
+          }
+        }
+      }
+    },
+    "Microsoft.Network/virtualNetworks/subnets": {
+      "type": "Microsoft.Network/virtualNetworks/subnets",
+      "depends_on_properties": false,
+      "name": {
+        "type": "value",
+        "description": null
+      },
+      "dependsOn": {
+        "type": "value",
+        "description": null
+      },
+      "properties": {
+        "type": "dict",
+        "addressPrefix": {
+          "type": "value",
+          "description": null
+        }
+      }
+    },
+    "AWS::EC2::SecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "depends_on_properties": false,
+      "properties": {
+        "GroupDescription": {
+          "type": "value",
+          "description": null
+        },
+        "SecurityGroupIngress": {
+          "type": "AWS::EC2::SecurityGroup::SecurityGroupIngress",
+          "description": null,
+          "values": [
+            {
+              "IpProtocol": {
+                "type": "value",
+                "description": null
+              },
+              "FromPort": {
+                "type": "value",
+                "description": null
+              },
+              "ToPort": {
+                "type": "value",
+                "description": null
+              },
+              "CidrIp": {
+                "type": "value",
+                "description": null
+              }
+            }
+          ]
+        },
+        "SecurityGroupEgress": {
+          "type": "AWS::EC2::SecurityGroup::SecurityGroupEgress",
+          "description": null,
+          "values": [
+            {
+              "IpProtocol": {
+                "type": "value",
+                "description": null
+              },
+              "FromPort": {
+                "type": "value",
+                "description": null
+              },
+              "ToPort": {
+                "type": "value",
+                "description": null
+              },
+              "CidrIp": {
+                "type": "value",
+                "description": null
+              }
+            }
+          ]
+        },
+        "Tags": {
+          "type": "special",
+          "description": null
+        }
+      }
+    },
+    "AWS::EC2::SecurityGroup::SecurityGroupEgress": {
+      "IpProtocol": {
+        "type": "value",
+        "description": null
+      },
+      "FromPort": {
+        "type": "value",
+        "description": null
+      },
+      "ToPort": {
+        "type": "value",
+        "description": null
+      },
+      "CidrIp": {
+        "type": "value",
+        "description": null
+      }
+    },
+    "AWS::EC2::SecurityGroup::SecurityGroupIngress": {
+      "IpProtocol": {
+        "type": "value",
+        "description": null
+      },
+      "FromPort": {
+        "type": "value",
+        "description": null
+      },
+      "ToPort": {
+        "type": "value",
+        "description": null
+      },
+      "CidrIp": {
+        "type": "value",
+        "description": null
+      }
+    },
+    "AWS::EC2::SecurityGroupEgress": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "depends_on_properties": true,
+      "Properties": {
+        "CidrIp": {
+          "type": "value",
+          "description": null
+        },
+        "CidrIpv6": {
+          "type": "value",
+          "description": null
+        },
+        "Description": {
+          "type": "value",
+          "description": null
+        },
+        "DestinationPrefixListId": {
+          "type": "value",
+          "description": null
+        },
+        "DestinationSecurityGroupId": {
+          "type": "value",
+          "description": null
+        },
+        "FromPort": {
+          "type": "value",
+          "description": null
+        },
+        "GroupId": {
+          "type": "value",
+          "description": null
+        },
+        "GroupName": {
+          "type": "value",
+          "description": null
+        },
+        "IpProtocol": {
+          "type": "value",
+          "description": null
+        },
+        "ToPort": {
+          "type": "value",
+          "description": null
+        }
+      }
+    },
+    "AWS::EC2::SecurityGroupIngress": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "depends_on_properties": true,
+      "Properties": {
+        "CidrIp": {
+          "type": "value",
+          "description": null
+        },
+        "CidrIpv6": {
+          "type": "value",
+          "description": null
+        },
+        "Description": {
+          "type": "value",
+          "description": null
+        },
+        "FromPort": {
+          "type": "value",
+          "description": null
+        },
+        "GroupId": {
+          "type": "value",
+          "description": null
+        },
+        "GroupName": {
+          "type": "value",
+          "description": null
+        },
+        "IpProtocol": {
+          "type": "value",
+          "description": null
+        },
+        "SourceSecurityGroupName": {
+          "type": "value",
+          "description": null
+        },
+        "SourceSecurityGroupId": {
+          "type": "value",
+          "description": null
+        },
+        "SourceSecurityGroupOwnerId": {
+          "type": "value",
+          "description": null
+        },
+        "ToPort": {
+          "type": "value",
+          "description": null
+        }
+      }
+    }
+  }
+}
