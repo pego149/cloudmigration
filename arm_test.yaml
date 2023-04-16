@@ -17,4 +17,7 @@ resources:
   Resource0:
     properties:
       cidr: 10.0.0.0/24
+      name: Subnet
+      network:
+        get_param: Net
     type: OS::Neutron::Subnet
