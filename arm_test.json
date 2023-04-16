@@ -2,7 +2,19 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "instance_name": {
+    "ServerFlavor": {
+      "defaultValue": "m1.micro",
+      "metadata": {
+        "description": "Server flavor to be configured"
+      }
+    },
+    "ServerImage": {
+      "defaultValue": "cirros-0.5.2-x86_64-disk",
+      "metadata": {
+        "description": "Server image to be configured"
+      }
+    },
+    "ServerName": {
       "allowedValues": [
         "server1",
         "server2",
@@ -13,18 +25,39 @@
       "metadata": {
         "description": "Name of the instance"
       },
-      "minLength": 8,
-      "type": "string"
+      "minLength": 8
     }
   },
   "resources": [
     {
+      "name": "private-network",
+      "type": "Microsoft.Network/virtualNetworks"
+    },
+    {
       "dependsOn": "[parameters('Net')]",
-      "name": "Subnet",
+      "name": "private-subnet",
       "properties": {
         "addressPrefix": "10.0.0.0/24"
       },
       "type": "Microsoft.Network/virtualNetworks/subnets"
+    },
+    {
+      "name": "[parameters('ServerName')]",
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[parameters('ServerFlavor')]"
+        },
+        "networkProfile": {
+          "networkIterfaces": {
+            "id": "[parameters('Net')]"
+          }
+        },
+        "storageProfile": "[parameters('ServerImage')]"
+      },
+      "tags": {
+        "Key1": "[parameters('ServerName')]"
+      },
+      "type": "Microsoft.Compute/virtualMachines"
     }
   ]
 }

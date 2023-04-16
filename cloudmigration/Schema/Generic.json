@@ -18,6 +18,7 @@
     },
     "resource": {
       "type": "type",
+      "tags": "tags",
       "properties": "properties",
       "ref": ["get_param", "get_resource"]
     }

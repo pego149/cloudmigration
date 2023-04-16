@@ -113,8 +113,8 @@ class Mapper:
         :param to_resource: Outgoing resource
         :return: Equivalent of the resource property if it exists, else None
         """
-        from_resource_properties = [i for i in self.mapping["resource_properties"][from_resource] if i is not None]
-        find_properties = [i for i in from_resource_properties if from_property in i]
+        from_resource_properties = [i for i in self.mapping["resource_properties"][from_resource]]
+        find_properties = [i for i in from_resource_properties if (i is not None and from_property in i)]
         if find_properties:
             return self.mapping["resource_properties"][to_resource][from_resource_properties.index(find_properties[0])]
         else:

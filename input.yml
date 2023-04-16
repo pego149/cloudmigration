@@ -1,23 +1,51 @@
 heat_template_version: 2018-08-31
-description: First instance in OpenStack created by Heat!
+
+description: >
+  First instance in OpenStack created by Heat!
 
 parameters:
-  instance_name:
+  ServerName:
     label: Instance name
     description: Name of the instance
     type: string
     default: test
     constraints:
-    - allowed_values: [ server1, server2, server3 ]
-    - length: { min: 3, max: 8 }
-    - allowed_pattern: "[A-Z]+[a-zA-Z0-9]*"
+      - allowed_values: [ server1, server2, server3 ]
+      - length: { min: 3, max: 8 }
+      - allowed_pattern: "[A-Z]+[a-zA-Z0-9]*"
+  ServerFlavor:
+    type: string
+    label: ServerFlavor
+    description: Server flavor to be configured
+    default: m1.micro
+  ServerImage:
+    type: string
+    label: ServerImage
+    description: Server image to be configured
+    default: cirros-0.5.2-x86_64-disk
 
 resources:
+  Net:
+    type: OS::Neutron::Net
+    properties:
+      name: 'private-network'
+      shared: false
   Subnet:
     type: OS::Neutron::Subnet
     properties:
-      name: Subnet
+      name: 'private-subnet'
       network: { get_resource: Net }
       cidr: 10.0.0.0/24
       enable_dhcp: true
+
+  Server:
+    type: OS::Nova::Server
+    properties:
+      name: { get_param: ServerName }
+      flavor: { get_param: ServerFlavor }
+      image: { get_param: ServerImage }
+      networks:
+        - network: { get_resource: Net }
+      tags:
+        - { get_param: ServerName }
 

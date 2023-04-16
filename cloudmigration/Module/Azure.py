@@ -108,17 +108,17 @@ class Azure(Generic):
         :return: Updated to_resource
         """
         if self.to_platform == "Generic":
-            if self.mapper.getResourcePropertyPair(from_resource[self.from_meta["resource"]["type"]], "Tags", to_resource[self.to_meta["resource"]["type"]]) is not None:
-                from_tags = from_resource.get("Tags", [])
+            if self.mapper.getResourcePropertyPair(from_resource[self.from_meta["resource"]["type"]], "tags", to_resource[self.to_meta["resource"]["type"]]) is not None:
+                from_tags = from_resource.get("tags", [])
                 if from_tags is not None and from_tags:
-                    for from_tag in from_tags:
-                        to_resource[self.to_meta["resource"]["properties"]].setdefault("tags", []).append({"key": from_tag["Key"], "value": from_tag["Value"]})
+                    for from_tag_k, from_tag_v in from_tags.items():
+                        to_resource[self.to_meta["resource"]["properties"]].setdefault("tags", []).append({"key": from_tag_k, "value": self.translateKeys("", from_tag_v)})
         elif self.from_platform == "Generic":
             if self.mapper.getResourcePropertyPair(from_resource[self.from_meta["resource"]["type"]], "tags", to_resource[self.to_meta["resource"]["type"]]) is not None:
                 from_tags = from_resource.get("tags", [])
                 if from_tags is not None and from_tags:
                     for from_tag in from_tags:
-                        to_resource.setdefault("tags", {})[from_tag["key"]] = from_tag["value"]
+                        to_resource.setdefault("tags", {})[from_tag["key"]] = self.translateKeys(list(from_tag["value"].keys())[0],list(from_tag["value"].values())[0])
         return to_resource
 
     # def translateResource(self, from_resource):

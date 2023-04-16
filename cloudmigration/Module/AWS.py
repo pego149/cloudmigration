@@ -191,7 +191,7 @@ class AWS(Generic):
                 ref = "Fn::Join"
         elif self.to_platform == "Generic":
             if ref == "Ref":
-                ref = "ref"
+                ref = "get_param"
             elif ref == "Fn::Join":
                 ref = "list_join"
         return { ref: value }

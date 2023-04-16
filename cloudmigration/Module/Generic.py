@@ -122,6 +122,8 @@ class Generic:
         for from_property, value in from_properties.items():
             if from_property in self.from_meta["resource"]["ref"]:#or isinstance(value, str) and any(x in value for x in self.from_meta["resource"]["ref"]):
                 return self.translateKeys(from_property, value)
+            if from_property == self.from_meta["resource"]["tags"] or from_property == self.from_meta["resource"]["type"]:
+                continue
             if not recursion == '':
                 from_property_splited = recursion + '.' + from_property
                 to_property = getMappingPair(_from, from_property_splited, _to)
@@ -129,9 +131,14 @@ class Generic:
                 from_property_splited = from_property
                 to_property = getMappingPair(_from, from_property, _to)
             if to_property is None and isinstance(from_properties[from_property], dict):
-                nested_properties = self.translateProperties(_from, from_properties[from_property],
-                                                           from_schema_properties, _to, to_schema_properties,
-                                                           getMappingPair, from_property)
+                if recursion == '':
+                    nested_properties = self.translateProperties(_from, from_properties[from_property],
+                                                                 from_schema_properties, _to, to_schema_properties,
+                                                                 getMappingPair, from_property)
+                else:
+                    nested_properties = self.translateProperties(_from, from_properties[from_property],
+                                                                 from_schema_properties, _to, to_schema_properties,
+                                                                 getMappingPair, recursion + "." + from_property)
                 if nested_properties:
                     to_property = getMappingPair(_from, from_property, _to)
                     nested = False
@@ -139,49 +146,54 @@ class Generic:
                         nested = True
                         from_property_path = from_property + "." + list(nested_properties.keys())[0]
                         to_property = getMappingPair(_from, from_property_path, _to)
-                    if not recursion == '':
-                        to_property_splited = to_property.replace(recursion + '.', '')
-                    else:
-                        to_property_splited = to_property
-                    to_property_path = self.print_path_to_key(to_property_splited, to_schema_properties)
-                    if not self.key_exists(to_property_path, to_properties) and not nested:
-                        self.set_nested(to_property_path, to_properties, nested_properties)
-                    elif nested:
-                        self.set_nested(to_property_path, to_properties, list(nested_properties.values())[0])
-                    else:
-                        to_properties.update(nested_properties)
+                    if to_property is not None:
+                        if not recursion == '':
+                            to_property_splited = to_property.replace(recursion + '.', '')
+                        else:
+                            to_property_splited = to_property
+                        to_property_path = self.print_path_to_key(to_property_splited, to_schema_properties)
+                        if not self.key_exists(to_property_path, to_properties) and not nested:
+                            self.set_nested(to_property_path, to_properties, nested_properties)
+                        elif nested:
+                            self.set_nested(to_property_path, to_properties, list(nested_properties.values())[0])
+                        else:
+                            to_properties.update(nested_properties)
 
             elif to_property is not None:
+                to_property_splited = to_property
                 if not recursion == '':
-                    to_property_splited = to_property.replace(recursion + '.', '')
-                else:
-                    to_property_splited = to_property
-                to_property_path = self.print_path_to_key(to_property_splited, to_schema_properties)
-                if from_properties[from_property] is not None and not isinstance(from_properties[from_property], dict):  # NULL MAY BE IMPORTANT
                     from_property_path = self.print_path_to_key(from_property_splited, from_schema_properties)
+                else:
+                    from_property_path = self.print_path_to_key(recursion + from_property_splited, from_schema_properties)
+                to_property_path = self.print_path_to_key(to_property_splited, to_schema_properties)
+                if from_properties[from_property] is not None and not isinstance(from_properties[from_property], dict) and from_property_splited != "type":  # NULL MAY BE IMPORTANT
                     from_property_type = self.get_nested(from_property_path, from_schema_properties)["type"]
                     to_property_type = self.get_nested(to_property, to_schema_properties)["type"]
                     if to_property_type != 'special' and from_property_type != 'special':
                         if (from_property_type == "value" and to_property_type == "value") or (isinstance(from_property_type, list) and isinstance(to_property_type, list) and not from_property_type and not to_property_type):
                             if isinstance(value, str) and any(x in value for x in self.from_meta["resource"]["ref"]):
-                                value = self.translateKeys(from_property, value)
+                                value = self.translateKeys("."+from_property, value)
                             self.set_nested(to_property_path, to_properties, value)
                         elif from_property_type == "value" and isinstance(to_property_type, list):
                             to_properties.setdefault(to_property_path, []).append(from_properties[from_property])
                         elif isinstance(from_property_type, list) and to_property_type == "value":
+                            to_property_path = ''.join(to_property.rsplit("."+str(list(from_properties[from_property][0].keys())[0]), 1))
                             self.set_nested(to_property_path, to_properties, from_properties[from_property][0])
 
                 elif isinstance(from_properties[from_property], dict):
-                    nested_properties = self.translateProperties(_from, from_properties[from_property], from_schema_properties, _to, to_schema_properties, getMappingPair, from_property)
+                    if recursion == '':
+                        nested_properties = self.translateProperties(_from, from_properties[from_property], from_schema_properties, _to, to_schema_properties, getMappingPair, from_property)
+                    else:
+                        nested_properties = self.translateProperties(_from, from_properties[from_property], from_schema_properties, _to, to_schema_properties, getMappingPair, recursion + "." + from_property)
                     if isinstance(nested_properties, str):
                         self.set_nested(to_property_path, to_properties, nested_properties)
                     elif isinstance(nested_properties, dict):
-                        if not self.key_exists(to_property_path, to_properties):
+                        if not self.key_exists(to_property_path, nested_properties) and not self.key_exists(self.to_meta["resource"]["properties"] + "." + to_property_path, nested_properties):
                             self.set_nested(to_property_path, to_properties, nested_properties)
                         else:
                             self.update(to_properties, nested_properties)
-        if isinstance(list(to_properties.values())[0], dict) and all(k in to_schema_properties for k in list(to_properties.values())[0]):
-            to_properties = to_properties[to_property_path]
+        if len(to_properties) > 0 and isinstance(list(to_properties.values())[0], dict) and all(k in to_schema_properties for k in list(to_properties.values())[0]):
+            to_properties = list(to_properties.values())[0]
         return to_properties
 
     def translateParameterType(self, from_parameter_type):
@@ -299,16 +311,6 @@ class Generic:
         #self.to_template = self.changeKeys(self.to_template, self.translateKeys)
         return self.to_template
 
-    def recursive_lookup(self, k, d):
-        for i in d:
-            if i == k:
-                return d[k]
-        for v in d.values():
-            if isinstance(v, dict) and v["type"] == "dict":
-                r = eval(k)
-                return self.recursive_lookup(k, v)
-        return None
-
     def set_nested(self,path, obj, value):
         *path, last = path.split(".")
         for bit in path:
@@ -342,75 +344,6 @@ class Generic:
                 for k, v in val.items():
                     queue.append((k, v, f"{path}.{k}"))
         return value
-
-    def flatten_dict(self, d, parent_key='', sep='.'):
-        """
-        Flatten a dictionary by concatenating keys with a separator.
-        """
-        items = []
-        for k, v in d.items():
-            new_key = f"{parent_key}{sep}{k}" if parent_key else k
-            if isinstance(v, MutableMapping):
-                items.extend(self.flatten_dict(v, new_key, sep=sep).items())
-            elif isinstance(v, MutableSequence):
-                for i, item in enumerate(v):
-                    sub_key = f"{new_key}{sep}{i}"
-                    if isinstance(item, MutableMapping):
-                        items.extend(self.flatten_dict(item, sub_key, sep=sep).items())
-                    else:
-                        items.append((sub_key, item))
-            else:
-                items.append((new_key, v))
-        return dict(items)
-
-    def unflatten_dict(self, d):
-        """
-        Unflatten a dictionary by splitting keys with a separator.
-        """
-        result_dict = {}
-        for key, value in d.items():
-            curr = result_dict
-            parts = key.split('.')
-            last_part = parts.pop()
-            for part in parts:
-                if isinstance(curr, list):
-                    curr = curr[int(part)]
-                else:
-                    curr = curr.setdefault(part, {})
-            if isinstance(curr, list):
-                curr.append(value)
-            else:
-                curr[last_part] = value
-        return result_dict
-
-    def dict_to_list(self, data, prefix=''):
-        result = []
-        for key, value in data.items():
-            full_key = prefix + '.' + key if prefix else key
-            if isinstance(value, dict):
-                result.extend(self.dict_to_list(value, full_key))
-            elif isinstance(value, list):
-                for i, item in enumerate(value):
-                    item_key = f"{full_key}.{i}"
-                    if isinstance(item, dict) or isinstance(item, list):
-                        result.extend(self.dict_to_list(item, item_key))
-                    else:
-                        result.append((item_key, item))
-            else:
-                result.append((full_key, value))
-        return result
-
-    def list_to_dict(self, lst):
-        multi_dict = {}
-        for key, value in lst.items():
-            parts = key.split('.')
-            current_dict = multi_dict
-            for part in parts[:-1]:
-                if part not in current_dict:
-                    current_dict[part] = {}
-                current_dict = current_dict[part]
-            current_dict[parts[-1]] = value
-        return multi_dict
 
     def update(self, d, u):
         for k, v in u.items():

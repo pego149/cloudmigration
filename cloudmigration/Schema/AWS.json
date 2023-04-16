@@ -17,6 +17,7 @@
     "resources": "Resources",
     "resource": {
       "type": "Type",
+      "tags": "Tags",
       "properties": "Properties",
       "ref": ["Ref"]
     }

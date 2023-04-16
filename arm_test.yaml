@@ -1,7 +1,13 @@
 description: null
 heat_template_version: pike
 parameters:
-  instance_name:
+  ServerFlavor:
+    default: m1.micro
+    description: Server flavor to be configured
+  ServerImage:
+    default: cirros-0.5.2-x86_64-disk
+    description: Server image to be configured
+  ServerName:
     constraints:
     - allowed_values:
       - server1
@@ -12,12 +18,29 @@ parameters:
         min: 3
     default: test
     description: Name of the instance
-    type: string
 resources:
   Resource0:
     properties:
+      name: private-network
+    type: OS::Neutron::Net
+  Resource1:
+    properties:
       cidr: 10.0.0.0/24
-      name: Subnet
+      name: private-subnet
       network:
         get_param: Net
     type: OS::Neutron::Subnet
+  Resource2:
+    properties:
+      flavor:
+        get_param: ServerFlavor
+      image:
+        get_param: ServerImage
+      name:
+        get_param: ServerName
+      networks:
+        network:
+          get_param: Net
+      tags:
+      - get_param: ServerName
+    type: OS::Nova::Server
