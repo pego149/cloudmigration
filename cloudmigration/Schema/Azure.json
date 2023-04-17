@@ -21,7 +21,7 @@
       "type": "type",
       "tags": "tags",
       "properties": "properties",
-      "ref": ["parameters"]
+      "ref": ["parameters", "resourceId"]
     }
   },
   "parameters": {

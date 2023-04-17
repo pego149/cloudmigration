@@ -142,14 +142,18 @@ class Azure(Generic):
         :return: Object with translated keys
         """
         if self.from_platform == "Generic":
-            if ref in ["get_param", "get_resource"]:
+            if ref in [ "get_param"]:
                 return "[parameters('" + value + "')]"
+            elif ref in [ "get_resource"]:
+                return "[resourceId('" + value + "')]"
             elif ref == "list_join":
                 ref = "[concat("+ (", '"+value[0]+"', ")
         elif self.to_platform == "Generic":
             list = re.split('\[|\(\'|\'\)', value)
             if "parameters" in list[1]:
                 ref = {"get_param" : list[2]}
+            elif "resourceId" in list[1]:
+                ref = {"get_resource" : list[2]}
             elif ref == "Fn::Join":
                 ref = "list_join"
         return ref

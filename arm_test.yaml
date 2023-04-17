@@ -28,7 +28,7 @@ resources:
       cidr: 10.0.0.0/24
       name: private-subnet
       network:
-        get_param: Net
+        get_resource: Net
     type: OS::Neutron::Subnet
   Resource2:
     properties:
@@ -40,7 +40,7 @@ resources:
         get_param: ServerName
       networks:
         network:
-          get_param: Net
+          get_resource: Net
       tags:
       - get_param: ServerName
     type: OS::Nova::Server
