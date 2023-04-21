@@ -28,12 +28,12 @@ resources:
   Net:
     type: OS::Neutron::Net
     properties:
-      name: 'private-network'
+      name: private-network
       shared: false
   Subnet:
     type: OS::Neutron::Subnet
     properties:
-      name: 'private-subnet'
+      name: private-subnet
       network: { get_resource: Net }
       cidr: 10.0.0.0/24
       enable_dhcp: true
